@@ -1,0 +1,36 @@
+\documentclass[a4paper,12pt,twoside]{article}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage{bbm}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=20mm]{geometry}
+
+\def\pprob         {\mbox{\normalfont\bfseries\sffamily P}}
+\def\prob        #1{\pprob\left\{#1\right\}}
+
+
+\begin{document}
+\begin{Large}
+Имеется 3 выборки: $A_1$, $A_2$, $A_3$.
+\[
+A_i^{(n)}=\{X_1^{(i)},\dots,X_n^{(i)}\}\subseteq V^{20},\ V=\{0,1\},
+\]
+$n\leq n_+=2^{20}\approx10^6$, $i=1,2,3$, $A_i$ ---
+классифицированная выборка,
+\[
+B_i=\{y_1^{(i)},\dots,y_n^{(i)}\},
+\]
+$y_j^{(i)}\in V$ --- номер класса, к которому относится вектор
+$X_j^{(i)}$, $j=1,\dots,n$, представленный в файле ``Yi.bin'' в виде
+$j$-го байта (все байты в файле равны 0 или 1).
+
+Обучающую подвыборку объема $n<n_+$ формируйте случайным образом из
+``полной'' выборки $A_i^{(n_+)}$.
+
+Выборка $A_i^{(n_+)}$ представлена в файле ``X.bin'' виде
+последовательности $n_+=2^{20}$ блоков, каждый по 3 байта; в каждом
+блоке первый байт представляет 8 первых бит вектора $X$ (младший
+$x_1$,..., старший $x_8$), второй байт: $x_9,\dots,x_{16}$, третий
+байт: $x_{17},\dots,x_{20},0,0,0,0$.
+
+\end{Large}
+\end{document}
