@@ -41,8 +41,8 @@ display_step = 100
 batch_size = 32
 
 # tf Graph input
-x = tf.placeholder(tf.float32, [None, n_input])
-y = tf.placeholder(tf.float32, [None, n_classes])
+x = tf.compat.v1.placeholder(tf.float32, [None, n_input])
+y = tf.compat.v1.placeholder(tf.float32, [None, n_classes])
 
 
 def multilayer_perceptron(x, weights, biases):
@@ -60,7 +60,7 @@ def multilayer_perceptron(x, weights, biases):
     return out_layer
 
 
-# Store layers weight &amp; bias
+# Store layers weight and biases
 weights = {
     'h1': tf.Variable(tf.random_normal([n_input, n_hidden_1])),
     'h2': tf.Variable(tf.random_normal([n_hidden_1, n_hidden_2])),

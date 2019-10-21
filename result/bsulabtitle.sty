@@ -1,0 +1,71 @@
+\newcommand*{\teacher}[1]{\gdef\@teacher{#1}}
+\newcommand*{\@teacher}{}
+
+\newcommand*{\teacherinfo}[1]{\gdef\@teacherinfo{#1}}
+\newcommand*{\@teacherinfo}{}
+
+\newcommand*{\subject}[1]{\gdef\@subject{#1}}
+\newcommand*{\@subject}{}
+
+
+\newcommand*{\subfaculty}[1]{\gdef\@subfaculty{#1}}
+\newcommand*{\@subfaculty}{}
+
+\newcommand*{\authorinfo}[1]{\gdef\@authorinfo{#1}}
+\newcommand*{\@authorinfo}{}
+
+\renewcommand{\maketitle}
+{
+\begin{titlepage}
+  \begin{center}
+  \textbf{
+    \Large{МИНИСТЕРСТО ОБРАЗОВАНИЯ РЕСПУБЛИКИ БЕЛАРУСЬ}\\
+    \vspace{1em}
+    \Large{БЕЛОРУССКИЙ ГОСУДАРСТВЕННЫЙ УНИВЕРСИТЕТ\\
+    \vspace{0.5em}
+    ФАКУЛЬТЕТ ПРИКЛАДНОЙ МАТЕМАТИКИ И ИНФОРМАТИКИ}\\
+    \vspace{1em}
+    \@subfaculty
+  }
+  \end{center}
+
+  \vspace{10em}
+
+  \begin{center}
+    \LARGE\textbf {\@author} \\
+    \vspace{1em}
+    \LARGE\textbf{\@title} \\
+    \vspace{1em}
+    Отчет по лабораторной работе
+    \linebreak
+    (``\@subject'')
+    \linebreak
+    \@authorinfo
+  \end{center}
+
+  \vspace{3em}
+
+  \begin{flushright}
+
+    \vspace{1em}
+
+    \textbf{Преподаватель} \\
+    \textit{\@teacher} \\
+    \@teacherinfo
+
+  \end{flushright}
+  \vspace{2em}
+  \begin{flushleft}
+    Работа сдана \line(1,0){100} \the\year г. \\
+    зачтена \line(1,0){100} \the\year г. \\
+
+    \textbf{Руководитель работы \\ \line(1,0){200}}
+  \end{flushleft}
+
+  \vfill
+
+  \begin{center}
+    Минск, \the\year
+  \end{center}
+\end{titlepage}
+}
