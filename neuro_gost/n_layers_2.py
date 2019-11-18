@@ -48,9 +48,9 @@ def to_float(block, bytes=4):
 
 
 def get_test_values(size=[32, 32]):
-    __in = read_from_file("GOST_generator/out_x.bin", 8,
+    __in = read_from_file("GOST_generator/out_x3.bin", 8,
                           lambda x: split_by_bit(x, size[0]))
-    __out = read_from_file("GOST_generator/out_y.bin", 8,
+    __out = read_from_file("GOST_generator/out_y3.bin", 8,
                            lambda x: split_by_bit(x, size[1]))
 
     return np.array(__in), np.array(__out)
@@ -132,7 +132,7 @@ def multilayer_perceptron(x, hidden, num_classes, number_layers, activation_fun=
 
 def init_network(input_data, output_data, n_input, n_hidden, n_classes, number_layers, learning_rate=0.001,
                  training_epochs=100, display_step=10, activation=tf.nn.sigmoid, optimizer=tf.train.AdamOptimizer):
-    with open("log1.txt", "a+") as f:
+    with open("log2.txt", "a+") as f:
         f.write('Start of neuron number_layers - {}\n'.format(number_layers))
     x = tf.placeholder(tf.float32, [None, n_input])
     y = tf.placeholder(tf.float32, [None, n_classes])
@@ -178,7 +178,7 @@ def init_network(input_data, output_data, n_input, n_hidden, n_classes, number_l
             if i % display_step == 0:
                 feed = {x: train_dataset, y: train_values}
                 result = sess.run([loss, accuracy], feed_dict=feed)
-                with open("log1.txt", "a+") as f:
+                with open("log2.txt", "a+") as f:
                     f.write('Accuracy at step %s: %f - loss: %f\n' % (i, result[1], result[0]))
                 print('Accuracy at step %s: %f - loss: %f\n' % (i, result[1], result[0]))
             else:
@@ -199,7 +199,7 @@ def init_network(input_data, output_data, n_input, n_hidden, n_classes, number_l
         acc = accuracy.eval(feed_dict={x: test_dataset, y: test_values})
         los = loss.eval(feed_dict={x: test_dataset, y: test_values})
 
-        with open("log1.txt", "a+") as f:
+        with open("log2.txt", "a+") as f:
             f.write("testing accuracy: {}\n".format(acc))
             f.write("testing Loss: {}\n".format(los))
             f.write("\n\n\n\n")
@@ -235,3 +235,8 @@ if __name__ == "__main__":
     x, y = init_network(input_data, output_data, n_input, [64, 256, 512], n_classes, 3,
                         activation=tf.nn.sigmoid, training_epochs=150000, display_step=1000)
 
+    x, y = init_network(input_data, output_data, n_input, [64, 128, 256, 512], n_classes, 4,
+                        activation=tf.nn.sigmoid, training_epochs=150000, display_step=1000)
+    
+    x, y = init_network(input_data, output_data, n_input, [64, 256, 512, 1024], n_classes, 4,
+                        activation=tf.nn.sigmoid, training_epochs=150000, display_step=1000)

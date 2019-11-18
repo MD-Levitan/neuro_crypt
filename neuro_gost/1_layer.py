@@ -13,20 +13,45 @@ def read_from_file(file, num_bytes, format_data=lambda x: int.from_bytes(x, byte
     return data
 
 
-def split_by_byte(block):
+def bits(num):
+    bits_array = []
+    for _ in range(0, 8):
+        bits_array.append(num % 2)
+        num //= 2
+    return list(reversed(bits_array))
+
+
+def _int(bit_array):
+    value = 0
+    for i in bit_array:
+        value *= 2
+        value += i
+    return int(value)
+
+
+def split_by_bit(block, bit=32):
+    rv = []
+    for i in block:
+        rv += bits(i)
+    return rv[:bit]
+
+
+def split_by_byte(block, bytes=4):
     rv = []
     for i in block:
         rv.append(int(i))
-    return rv
+    return rv[:bytes]
 
 
 def to_float(block, bytes=4):
     return [int.from_bytes(block[:4], byteorder='little') / pow(2, 8 * bytes)]
 
 
-def get_test_values():
-    __in = read_from_file("GOST_generator/out_x.bin", 8, to_float)
-    __out = read_from_file("GOST_generator/out_y.bin", 8, to_float)
+def get_test_values(size=[32, 32]):
+    __in = read_from_file("GOST_generator/out_x.bin", 8,
+                          lambda x: split_by_bit(x, size[0]))
+    __out = read_from_file("GOST_generator/out_y.bin", 8,
+                           lambda x: split_by_bit(x, size[1]))
 
     return np.array(__in), np.array(__out)
 
@@ -35,20 +60,26 @@ def init_one_layer_network(input_data, output_data, n_input, n_classes, training
                            optimizer=tf.train.AdamOptimizer):
 
     x = tf.placeholder(tf.float32, [None, n_input])
-    y = tf.placeholder(tf.float32, [None, 1])
+    y = tf.placeholder(tf.float32, [None, n_classes])
 
     # Create the model
     # W = tf.Variable(tf.random_normal(shape=[n_input, 1]))
     # b = tf.Variable(tf.random_normal([1]))
     # out = tf.matmul(x, W) + b
 
-    out = tf.layers.dense(x, 1, activation=tf.nn.sigmoid, name="output")
+    out = tf.layers.dense(x, n_classes, activation=tf.nn.sigmoid)
 
-    loss = tf.reduce_mean(tf.square(out - y))
+    hamming_distance = tf.math.count_nonzero(tf.round(out) - y, axis=-1)
+    accuracy = tf.reduce_mean(hamming_distance)
+
+    loss = tf.losses.sigmoid_cross_entropy(y, out)
+    loss1 = tf.keras.losses.binary_crossentropy(y, out)
+
+    cost = tf.reduce_mean(tf.square(out - y))
+
+    cost1 = tf.reduce_mean(tf.cast(tf.math.count_nonzero(out - y, axis=-1), tf.float32))
+
     train_step = optimizer(learning_rate=0.002).minimize(loss)
-    correct_prediction = tf.equal(out, y)
-
-    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     init = tf.global_variables_initializer()
     # Train the model, and feed in test data and record summaries every 10 steps
@@ -69,15 +100,13 @@ def init_one_layer_network(input_data, output_data, n_input, n_classes, training
                 feed = {x: train_dataset, y: train_values}
             sess.run(train_step, feed_dict=feed)
 
-        test_values1 = sess.run(out, feed_dict={
-            x: test_dataset,
-        })
+        test_values1 = tf.round(out).eval(feed_dict={x: test_dataset})
 
-        plt.plot(test_dataset, test_values, "bo",
-                 test_dataset, test_values1, "ro")
-        plt.show()
+        print(list(map(lambda x: hex(_int(x)), test_values1)))
+        print(list(map(lambda x: hex(_int(x)), test_values)))
+        print(list(map(lambda x: hex(_int(x)), test_dataset)))
 
-        accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
+        accuracy = tf.reduce_mean(tf.cast(hamming_distance, "float"))
         acc = accuracy.eval(feed_dict={x: test_dataset, y: test_values})
         los = loss.eval(feed_dict={x: test_dataset, y: test_values})
 
@@ -90,10 +119,11 @@ def init_one_layer_network(input_data, output_data, n_input, n_classes, training
 
 
 if __name__ == "__main__":
-    input_data, output_data = get_test_values()
+    input_data, output_data = get_test_values([64, 64])
 
     # Network Parameters
-    n_input = 1
+    n_input = 64
+    n_classes = 64
 
-    x, y = init_one_layer_network(input_data, output_data, n_input, 1,
-                                  training_epochs=10000, display_step=1000)
+    x, y = init_one_layer_network(input_data, output_data, n_input, n_classes,
+                                   training_epochs=10000, display_step=1000)

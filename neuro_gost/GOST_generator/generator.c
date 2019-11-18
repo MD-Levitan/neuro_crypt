@@ -11,7 +11,7 @@ static uint8_t key[32] = {
 	0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef
 };
 
-const char *usage = "Usage:  ./generator <SIZE>";
+const char *usage = "Usage:  ./generator <SIZE> <GEN_TYPE>";
 
 void iterate_generator(struct crypto_tfm *ctx, uint64_t size, 
 					   FILE *out_file_x, FILE *out_file_y)
@@ -19,8 +19,8 @@ void iterate_generator(struct crypto_tfm *ctx, uint64_t size,
 	uint64_t in, out;
 	for (in = 0; in < size; ++in)
 	{
-		//out = in * 2;
 		magma_it(ctx, (uint8_t *) &out, (uint8_t *) &in, 0);
+		
 		fwrite((uint8_t *) &in, sizeof(uint8_t), 8, out_file_x);
 		fwrite((uint8_t *) &out, sizeof(uint8_t), 8, out_file_y);
 	}
@@ -35,13 +35,33 @@ void random_generator(struct crypto_tfm *ctx, uint64_t size,
 	
 	for (uint64_t i = 0; i < size; ++i)
 	{
-		in = rand();
-		//out = in * 2;
+		in = 0;
+		((uint32_t *) &in)[0] = rand();
+		((uint32_t *) &in)[1] = rand();
 		magma_it(ctx, (uint8_t *) &out, (uint8_t *) &in, 0);
 		fwrite((uint8_t *) &in, sizeof(uint8_t), 8, out_file_x);
 		fwrite((uint8_t *) &out, sizeof(uint8_t), 8, out_file_y);
 	}
 }
+
+void random_generator_n(struct crypto_tfm *ctx, uint64_t size, 
+					   uint8_t n, FILE *out_file_x, FILE *out_file_y)
+{
+	uint64_t in, out;
+	srand(time(NULL));
+	
+	for (uint64_t i = 0; i < size; ++i)
+	{
+		in = 0;
+		((uint32_t *) &in)[0] = rand();
+		((uint32_t *) &in)[1] = rand();
+		magma_it_n(ctx, (uint8_t *) &out, (uint8_t *) &in, n);
+		fwrite((uint8_t *) &in, sizeof(uint8_t), 8, out_file_x);
+		fwrite((uint8_t *) &out, sizeof(uint8_t), 8, out_file_y);
+	}
+}
+
+
 
 /*
  *	Generator
@@ -76,13 +96,27 @@ int main(int argc, const char **argv) {
 	
 	ctx = create_tfm_ctx();
 	magma_setkey(ctx, key, sizeof(key));
-	if (rv == 2) {
-		random_generator(ctx, size, out_file_x, out_file_y);
-	} else {
-		iterate_generator(ctx, size, out_file_x, out_file_y);
+	switch(rv)
+	{ 
+		case 2: 
+		{
+			random_generator(ctx, size, out_file_x, out_file_y);
+			break;
+		}
+		case 1: 
+		{ 
+			iterate_generator(ctx, size, out_file_x, out_file_y);
+			break;
+		}
+		case 3:
+		{
+			random_generator_n(ctx, size, 2, out_file_x, out_file_y);
+			break;
+		}
 	}
 	
 	fclose(out_file_x);
 	fclose(out_file_y);	
 	delete_tfm_ctx(ctx);
 }
+

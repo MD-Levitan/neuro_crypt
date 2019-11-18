@@ -242,6 +242,9 @@ inline static uint32_t f(uint32_t x)
 int magma_setkey(struct crypto_tfm *tfm, const uint8_t *key,
 			unsigned int key_len)
 {
+	if (key_len != 32)
+		return 1;
+	
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	subkeys->k[0] = GETU32_BE(key);
 	subkeys->k[1] = GETU32_BE(key + 4);
@@ -313,8 +316,6 @@ void magma_it(struct crypto_tfm *tfm, uint8_t *out,
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0;
 	
-	//printf("in - %"PRId64" , n2 - %lld , n1 - %lld \n", *((uint64_t*) in), n2, n1);
-	
 	if (iter >= 23)	{
 		buf = n2 ^ f(n1 + subkeys->k[7 - iter % 8]);
 	}
@@ -326,9 +327,34 @@ void magma_it(struct crypto_tfm *tfm, uint8_t *out,
 	buf = 0;
 	
 	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;
+	((uint32_t*)out)[1] = n2;	
+}
+
+void magma_it_n(struct crypto_tfm *tfm, uint8_t *out,
+					 const uint8_t *in, uint8_t num)
+{
+	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
+	uint32_t n2 = GETU32_BE(in);
+	uint32_t n1 = GETU32_BE(in + 4);
+	uint32_t buf = 0;
+
+	for(uint8_t it = 0; it < num; ++it)
+	{
+		
+		buf = n2 ^ f(n1 + subkeys->k[(it >=23) ? (7 - it % 8) : (it % 8)]);
+		n2 = n1;
+		n1 = buf;
+	}
 	
-	//printf("out - %"PRId64" , n2 - %lld , n1 - %lld \n", *((uint64_t*) out), n2, n1);
+	if (num % 2)
+	{
+		n1 ^= n2;
+		n2 ^= n1;
+		n1 ^= n2;
+	}
+	
+	((uint32_t*)out)[0] = n1;
+	((uint32_t*)out)[1] = n2;
 	
 }
 
