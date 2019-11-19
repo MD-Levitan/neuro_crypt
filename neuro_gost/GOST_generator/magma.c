@@ -398,19 +398,19 @@ void _magma_encrypt(struct crypto_tfm *tfm, uint8_t *out,
 	((uint32_t*)out)[1] = n2;
 }
 
-void magma_neuro(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint8_t *x, uint8_t *y)
+void magma_neuro(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
-	uint32_t buf = 0;
+	uint32_t buf = 0, buf2;
 	
 	buf = f_neuro(n1 + subkeys->k[0]);
 	n2 	= n2 << 21 | n2 >> 11;
 	buf = n2 ^ buf;
-
-	*((uint32_t *) x) = n2;
- 	*((uint32_t *) y) = buf;
+	
+	*x = BSWAP32(n2);
+ 	*y = BSWAP32(buf);
 
 	buf = buf << 11 | buf >> (32 - 11);
 

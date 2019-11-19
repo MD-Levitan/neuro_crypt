@@ -96,7 +96,7 @@ extern void magma_decrypt(struct crypto_tfm *tfm, uint8_t *out,
  * @param y			y for neural network
  */
 extern void magma_neuro(struct crypto_tfm *tfm, uint8_t *out,
-					 const uint8_t *in, uint8_t *x, uint8_t *y);
+					 const uint8_t *in, uint32_t *x, uint32_t *y);
 
 
 #define magma_step(tfm, out, in) \
