@@ -47,6 +47,8 @@ extern int magma_setkey(struct crypto_tfm *tfm, const uint8_t *key,
  */
 extern void magma_encrypt(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in);
 
+extern void _magma_encrypt(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in);
+
 /**
  * @brief Encyption of block by only i iteration
  * 
@@ -56,6 +58,9 @@ extern void magma_encrypt(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *i
  * @param iter		iteration of GOST alg
  */
 extern void magma_it(struct crypto_tfm *tfm, uint8_t *out,
+					 const uint8_t *in, uint8_t iter);
+
+extern void _magma_it(struct crypto_tfm *tfm, uint8_t *out,
 					 const uint8_t *in, uint8_t iter);
 
 /**
@@ -78,6 +83,21 @@ extern void magma_it_n(struct crypto_tfm *tfm, uint8_t *out,
  */
 extern void magma_decrypt(struct crypto_tfm *tfm, uint8_t *out,
 			  		 const uint8_t *in);					 
+
+/**
+ * @brief Fucntion for creation pair for Neural Network.
+ * 
+ * in = (in_1 || in_2 || in_3 || in_4)
+ * 
+ * x_j = S[in_j] ^ in_{j} 
+ * 
+ * @param tfm		crypto instance
+ * @param out		result of encryption
+ * @param y			y for neural network
+ */
+extern void magma_neuro(struct crypto_tfm *tfm, uint8_t *out,
+					 const uint8_t *in, uint8_t *x, uint8_t *y);
+
 
 #define magma_step(tfm, out, in) \
 	magma_it(tfm, out, in, 0)
