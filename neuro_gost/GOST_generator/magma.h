@@ -82,20 +82,29 @@ extern void magma_it_n(struct crypto_tfm *tfm, uint8_t *out,
  * @param in		ciphertext block
  */
 extern void magma_decrypt(struct crypto_tfm *tfm, uint8_t *out,
-			  		 const uint8_t *in);					 
+			  			  const uint8_t *in);					 
+
 
 /**
  * @brief Fucntion for creation pair for Neural Network.
- * 
- * in = (in_1 || in_2 || in_3 || in_4)
- * 
- * x_j = S[in_j] ^ in_{j} 
+ * You can find description of this function(model) in report as model g_1.
  * 
  * @param tfm		crypto instance
  * @param out		result of encryption
  * @param y			y for neural network
  */
-extern void magma_neuro(struct crypto_tfm *tfm, uint8_t *out,
+extern void magma_neuro_g1(struct crypto_tfm *tfm, uint8_t *out,
+						   const uint8_t *in, uint32_t *x, uint32_t *y);
+
+/**
+ * @brief Fucntion for creation pair for Neural Network.
+ * You can find description of this function(model) in report as model g_2.
+ * 
+ * @param tfm		crypto instance
+ * @param out		result of encryption
+ * @param y			y for neural network
+ */
+extern void magma_neuro_g2(struct crypto_tfm *tfm, uint8_t *out,
 					 const uint8_t *in, uint32_t *x, uint32_t *y);
 
 

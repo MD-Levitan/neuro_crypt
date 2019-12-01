@@ -4,14 +4,14 @@
 
 #include "magma.h"
 
-static uint8_t key[32] = { 0x01 };
-/*
+static uint8_t key[32] = //{ 0x01 };
+{
  	0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff,
  	0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
  	0xfe, 0xdc, 0xba, 0x98, 0x76, 0x54, 0x32, 0x10,
  	0x01, 0x23, 0x45, 0x67, 0x89, 0xab, 0xcd, 0xef
 };
-*/
+
 
 const char *usage = "Usage:  ./generator <SIZE> <GEN_TYPE>";
 
@@ -90,7 +90,7 @@ void random_generator_n(struct crypto_tfm *ctx, uint64_t size,
 	fclose(out_file_y);	
 }
 
-void random_generator_primitive(struct crypto_tfm *ctx, uint64_t size,
+void random_generator_primitive_g2(struct crypto_tfm *ctx, uint64_t size,
 								char *filename_x, char *filename_y)
 {
 	FILE *out_file_x, *out_file_y;
@@ -106,7 +106,7 @@ void random_generator_primitive(struct crypto_tfm *ctx, uint64_t size,
 		in = 0;
 		((uint32_t *) &in)[0] = rand();
 		((uint32_t *) &in)[1] = rand();
-		magma_neuro(ctx, (uint8_t *) &out, (uint8_t *) &in, &x, &y);
+		magma_neuro_g2(ctx, (uint8_t *) &out, (uint8_t *) &in, &x, &y);
 
 		// printf("%llx\n", x);
 		// printf("%llx\n", y);
@@ -135,6 +135,95 @@ void random_generator_primitive(struct crypto_tfm *ctx, uint64_t size,
 	fclose(out_file_y);	
 }
 
+void random_generator_primitive_g1(struct crypto_tfm *ctx, uint64_t size,
+								char *filename_x, char *filename_y)
+{
+	FILE *out_file_x, *out_file_y;
+	out_file_x = fopen(filename_x, "wb");
+	out_file_y = fopen(filename_y, "wb");	
+
+	uint64_t in, out;
+	uint32_t x, y;
+	srand(time(NULL));
+	
+	for (uint64_t i = 0; i < size; ++i)
+	{
+		in = 0;
+		((uint32_t *) &in)[0] = rand();
+		((uint32_t *) &in)[1] = rand();
+		magma_neuro_g1(ctx, (uint8_t *) &out, (uint8_t *) &in, &x, &y);
+
+		// printf("%llx\n", x);
+		// printf("%llx\n", y);
+		// printf("%llx\n", in);
+		// printf("%llx\n", out);
+
+		uint8_t p = 0; 
+		//for (uint8_t p = 0; p < 8; ++p)
+		//{
+			uint8_t var = ((uint8_t *) &in)[4 + p / 2];
+			var = p % 2 ?  (var & 0xF) : (var >> 4 & 0xF);
+
+			uint8_t var1 = ((uint8_t *) &x)[p / 2];
+			var1 = p % 2 ?  (var1 & 0xF) : (var1 >> 4 & 0xF);
+			var = (var << 4) | var1;
+
+			uint8_t var2 = ((uint8_t *) &y)[p / 2];
+			var2 = p % 2 ?  (var2 & 0xF) : (var2 >> 4 & 0xF);
+			
+			fwrite(&var, sizeof(uint8_t), 1, out_file_x);
+			fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+		//}
+	}
+
+	fclose(out_file_x);
+	fclose(out_file_y);	
+}
+
+void random_generator_primitive_g0(struct crypto_tfm *ctx, uint64_t size,
+								char *filename_x, char *filename_y)
+{
+	FILE *out_file_x, *out_file_y;
+	out_file_x = fopen(filename_x, "wb");
+	out_file_y = fopen(filename_y, "wb");	
+
+	uint64_t in, out;
+	uint32_t x, y;
+	srand(time(NULL));
+	
+	for (uint64_t i = 0; i < size; ++i)
+	{
+		in = 0;
+		((uint32_t *) &in)[0] = rand();
+		((uint32_t *) &in)[1] = rand();
+		magma_neuro_g1(ctx, (uint8_t *) &out, (uint8_t *) &in, &x, &y);
+
+		// printf("%llx\n", x);
+		// printf("%llx\n", y);
+		// printf("%llx\n", in);
+		// printf("%llx\n", out);
+
+		uint8_t p = 0; 
+		//for (uint8_t p = 0; p < 8; ++p)
+		//{
+			uint8_t var = ((uint8_t *) &in)[4 + p / 2];
+			var = p % 2 ?  (var & 0xF) : (var >> 4 & 0xF);
+
+			uint8_t var1 = ((uint8_t *) &x)[p / 2];
+			var1 = p % 2 ?  (var1 & 0xF) : (var1 >> 4 & 0xF);
+			var = (var << 4) | var1;
+
+			uint8_t var2 = ((uint8_t *) &y)[p / 2];
+			var2 = p % 2 ?  (var2 & 0xF) : (var2 >> 4 & 0xF);
+			
+			fwrite(&var, sizeof(uint8_t), 1, out_file_x);
+			fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+		//}
+	}
+
+	fclose(out_file_x);
+	fclose(out_file_y);	
+}
 
 
 /*
@@ -187,9 +276,24 @@ int main(int argc, const char **argv) {
 		}
 		case 4:
 		{
-			random_generator_primitive(ctx, size,
-									  "bin/out_primitive_x.bin",
-									  "bin/out_primitive_y.bin");
+			random_generator_primitive_g1(ctx, size,
+									  "bin/out_primitive0_x.bin",
+									  "bin/out_primitive0_y.bin");
+			break;
+		}
+		case 5:
+		{
+			random_generator_primitive_g1(ctx, size,
+									  "bin/out_primitive1_x.bin",
+									  "bin/out_primitive1_y.bin");
+			break;
+		}
+		case 6:
+		{
+			random_generator_primitive_g2(ctx, size,
+									  "bin/out_primitive2_x.bin",
+									  "bin/out_primitive2_y.bin");
+			break;
 		}
 	}
 	

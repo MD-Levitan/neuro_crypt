@@ -3,6 +3,7 @@
  *
  */
  
+
 #include <memory.h>
 #include <stdlib.h>
 #include <inttypes.h>
@@ -268,8 +269,38 @@ inline static uint32_t _f(uint32_t x)
 	return x<<11 | x>>(32-11);
 }
 
+
 /* neuro  primitive without rotation*/
-inline static uint32_t f_neuro(uint32_t x)
+inline static uint32_t f_neuro_g1(uint32_t x, uint32_t key)
+{
+	uint8_t buf, buf1;
+	// printf("x: %llx\n", x);
+	// printf("key: %llx\n", key);
+	for (size_t i = 0; i < 8; i+=2)
+	{
+		// printf("x_: %x\n", (x >> (4 * i) & 15));
+		// printf("key_: %x\n", (key >> (4 * i) & 15));
+		
+		// printf("x_: %x\n", (x >> (4 * i + 4) & 15));
+		// printf("key_: %x\n", (key >> (4 * i + 4) & 15));
+
+		buf = ((x >> (4 * i) & 15) + (key >> (4 * i) & 15)) & 15;
+		buf1 = ((x >> (4 * i + 4) & 15) + (key >> (4 * i + 4) & 15)) & 15;
+		// printf("buf: %x\n", buf);
+		// printf("buf1: %x\n", buf1);
+		// printf("sum: %lx\n", buf | (buf1 << 4));
+		
+		((uint8_t *)&x)[i / 2] = buf | (buf1 << 4);
+	}
+	// printf("x: %llx\n", x);
+	x = k8[x>>28 & 15] << 28 | k7[x>>24 & 15] << 24 |
+	    k6[x>>20 & 15] << 20 | k5[x>>16 & 15] << 16 |
+	    k4[x>>12 & 15] << 12 | k3[x>> 8 & 15] <<  8 |
+	    k2[x>> 4 & 15] <<  4 | k1[x     & 15];
+}
+
+/* neuro  primitive without rotation*/
+inline static uint32_t f_neuro_g2(uint32_t x)
 {
 	x = k8[x>>28 & 15] << 28 | k7[x>>24 & 15] << 24 |
 	    k6[x>>20 & 15] << 20 | k5[x>>16 & 15] << 16 |
@@ -398,15 +429,54 @@ void _magma_encrypt(struct crypto_tfm *tfm, uint8_t *out,
 	((uint32_t*)out)[1] = n2;
 }
 
-void magma_neuro(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
+void magma_neuro_g0(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0, buf2;
 	
-	printf("%d\n", subkeys->k[0]);
-	buf = f_neuro(n1 + subkeys->k[0]);
+	buf = n1;
+	n2 	= n2 << 21 | n2 >> 11;
+	buf = n2 ^ buf;
+	
+	*x = BSWAP32(n2);
+ 	*y = BSWAP32(buf);
+
+	buf = buf << 11 | buf >> (32 - 11);
+
+	((uint32_t*)out)[0] = buf;
+	((uint32_t*)out)[1] = n1;	
+}
+
+void magma_neuro_g1(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
+{
+	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
+	uint32_t n2 = GETU32_BE(in);
+	uint32_t n1 = GETU32_BE(in + 4);
+	uint32_t buf = 0, buf2;
+	
+	buf = f_neuro_g1(n1, subkeys->k[0]);
+	n2 	= n2 << 21 | n2 >> 11;
+	buf = n2 ^ buf;
+	
+	*x = BSWAP32(n2);
+ 	*y = BSWAP32(buf);
+
+	buf = buf << 11 | buf >> (32 - 11);
+
+	((uint32_t*)out)[0] = buf;
+	((uint32_t*)out)[1] = n1;	
+}
+
+void magma_neuro_g2(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
+{
+	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
+	uint32_t n2 = GETU32_BE(in);
+	uint32_t n1 = GETU32_BE(in + 4);
+	uint32_t buf = 0, buf2;
+	
+	buf = f_neuro_g2(n1 + subkeys->k[0]);
 	n2 	= n2 << 21 | n2 >> 11;
 	buf = n2 ^ buf;
 	

@@ -2041,3 +2041,405 @@ testing Loss: 0.2402941733598709
 
 
 
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 2.126321
+testing accuracy: 1.7404999732971191
+testing Loss: 0.2385227084159851
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 1.771443
+testing accuracy: 1.8109999895095825
+testing Loss: 0.23120468854904175
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 0.579605
+Accuracy at step 1000: 1.000000 - loss: 0.224169
+Accuracy at step 2000: 1.000000 - loss: 0.159666
+Accuracy at step 3000: 0.000000 - loss: 0.114546
+Accuracy at step 4000: 0.000000 - loss: 0.079485
+Accuracy at step 5000: 0.000000 - loss: 0.046972
+Accuracy at step 6000: 0.000000 - loss: 0.027859
+Accuracy at step 7000: 0.000000 - loss: 0.014579
+Accuracy at step 8000: 0.000000 - loss: 0.004370
+Accuracy at step 9000: 0.000000 - loss: 0.000767
+testing accuracy: 0.0
+testing Loss: 0.00022387388162314892
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 3.000000 - loss: 2.118594
+Accuracy at step 1000: 1.000000 - loss: 0.241818
+Accuracy at step 2000: 1.000000 - loss: 0.235483
+Accuracy at step 3000: 1.000000 - loss: 0.218472
+Accuracy at step 4000: 1.000000 - loss: 0.200446
+Accuracy at step 5000: 1.000000 - loss: 0.176409
+Accuracy at step 6000: 1.000000 - loss: 0.156708
+Accuracy at step 7000: 1.000000 - loss: 0.140852
+Accuracy at step 8000: 1.000000 - loss: 0.133789
+Accuracy at step 9000: 0.000000 - loss: 0.132144
+testing accuracy: 1.0255000591278076
+testing Loss: 0.13321435451507568
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 3.000000 - loss: 1.901201
+Accuracy at step 1000: 1.000000 - loss: 0.240857
+Accuracy at step 2000: 1.000000 - loss: 0.231750
+Accuracy at step 3000: 1.000000 - loss: 0.213042
+Accuracy at step 4000: 1.000000 - loss: 0.188830
+Accuracy at step 5000: 1.000000 - loss: 0.165421
+Accuracy at step 6000: 1.000000 - loss: 0.149944
+Accuracy at step 7000: 1.000000 - loss: 0.138542
+Accuracy at step 8000: 0.000000 - loss: 0.132733
+Accuracy at step 9000: 0.000000 - loss: 0.132110
+Accuracy at step 10000: 0.000000 - loss: 0.131857
+Accuracy at step 11000: 0.000000 - loss: 0.131741
+Accuracy at step 12000: 0.000000 - loss: 0.131661
+Accuracy at step 13000: 0.000000 - loss: 0.131618
+Accuracy at step 14000: 0.000000 - loss: 0.131594
+testing accuracy: 1.0089999437332153
+testing Loss: 0.132877379655838
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 3.000000 - loss: 1.776531
+Accuracy at step 1000: 1.000000 - loss: 0.248234
+Accuracy at step 2000: 1.000000 - loss: 0.240495
+Accuracy at step 3000: 1.000000 - loss: 0.228393
+Accuracy at step 4000: 1.000000 - loss: 0.218431
+Accuracy at step 5000: 1.000000 - loss: 0.203194
+Accuracy at step 6000: 1.000000 - loss: 0.194848
+Accuracy at step 7000: 1.000000 - loss: 0.189852
+Accuracy at step 8000: 1.000000 - loss: 0.186079
+Accuracy at step 9000: 1.000000 - loss: 0.183441
+Accuracy at step 10000: 1.000000 - loss: 0.181966
+Accuracy at step 11000: 1.000000 - loss: 0.181178
+Accuracy at step 12000: 1.000000 - loss: 0.180700
+Accuracy at step 13000: 1.000000 - loss: 0.176390
+Accuracy at step 14000: 1.000000 - loss: 0.170970
+testing accuracy: 1.2085000276565552
+testing Loss: 0.16915389895439148
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 1.513479
+Accuracy at step 1000: 1.000000 - loss: 0.243752
+Accuracy at step 2000: 1.000000 - loss: 0.233660
+Accuracy at step 3000: 1.000000 - loss: 0.207465
+Accuracy at step 4000: 1.000000 - loss: 0.180622
+Accuracy at step 5000: 1.000000 - loss: 0.158546
+Accuracy at step 6000: 1.000000 - loss: 0.149877
+Accuracy at step 7000: 1.000000 - loss: 0.143535
+Accuracy at step 8000: 0.000000 - loss: 0.136975
+Accuracy at step 9000: 0.000000 - loss: 0.131969
+Accuracy at step 10000: 0.000000 - loss: 0.127923
+Accuracy at step 11000: 0.000000 - loss: 0.123838
+Accuracy at step 12000: 0.000000 - loss: 0.122602
+Accuracy at step 13000: 0.000000 - loss: 0.121874
+Accuracy at step 14000: 0.000000 - loss: 0.121164
+testing accuracy: 0.800000011920929
+testing Loss: 0.12218089401721954
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 1.647851
+Accuracy at step 1000: 1.000000 - loss: 0.242157
+Accuracy at step 2000: 1.000000 - loss: 0.222771
+Accuracy at step 3000: 1.000000 - loss: 0.200579
+Accuracy at step 4000: 1.000000 - loss: 0.168065
+Accuracy at step 5000: 0.000000 - loss: 0.137127
+Accuracy at step 6000: 0.000000 - loss: 0.108283
+Accuracy at step 7000: 0.000000 - loss: 0.085708
+Accuracy at step 8000: 0.000000 - loss: 0.080520
+Accuracy at step 9000: 0.000000 - loss: 0.074460
+Accuracy at step 10000: 0.000000 - loss: 0.064990
+Accuracy at step 11000: 0.000000 - loss: 0.059959
+Accuracy at step 12000: 0.000000 - loss: 0.057330
+Accuracy at step 13000: 0.000000 - loss: 0.049942
+Accuracy at step 14000: 0.000000 - loss: 0.044187
+testing accuracy: 0.17900000512599945
+testing Loss: 0.03958404064178467
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 0.480222
+Accuracy at step 1000: 1.000000 - loss: 0.217982
+Accuracy at step 2000: 1.000000 - loss: 0.169573
+Accuracy at step 3000: 0.000000 - loss: 0.111191
+Accuracy at step 4000: 0.000000 - loss: 0.077751
+Accuracy at step 5000: 0.000000 - loss: 0.058449
+Accuracy at step 6000: 0.000000 - loss: 0.043292
+Accuracy at step 7000: 0.000000 - loss: 0.025718
+Accuracy at step 8000: 0.000000 - loss: 0.013156
+Accuracy at step 9000: 0.000000 - loss: 0.007677
+Accuracy at step 10000: 0.000000 - loss: 0.003910
+Accuracy at step 11000: 0.000000 - loss: 0.003701
+Accuracy at step 12000: 0.000000 - loss: 0.000588
+Accuracy at step 13000: 0.000000 - loss: 0.000068
+Accuracy at step 14000: 0.000000 - loss: 0.000026
+testing accuracy: 0.0
+testing Loss: 1.2901396985398605e-05
+
+
+
+
+Start of neuron number_layers - 2
+Accuracy at step 0: 3.000000 - loss: 2.408790
+Accuracy at step 1000: 1.000000 - loss: 0.249996
+Accuracy at step 2000: 1.000000 - loss: 0.249996
+Accuracy at step 3000: 1.000000 - loss: 0.249996
+Accuracy at step 4000: 1.000000 - loss: 0.249996
+Accuracy at step 5000: 1.000000 - loss: 0.249996
+Accuracy at step 6000: 1.000000 - loss: 0.249996
+Accuracy at step 7000: 1.000000 - loss: 0.249996
+Accuracy at step 8000: 1.000000 - loss: 0.249996
+Accuracy at step 9000: 1.000000 - loss: 0.249996
+Accuracy at step 10000: 1.000000 - loss: 0.249996
+Accuracy at step 11000: 1.000000 - loss: 0.249996
+Accuracy at step 12000: 1.000000 - loss: 0.249996
+Accuracy at step 13000: 1.000000 - loss: 0.249997
+Accuracy at step 14000: 1.000000 - loss: 0.249998
+testing accuracy: 2.061500072479248
+testing Loss: 0.25006306171417236
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 2.226618
+Accuracy at step 1000: 1.000000 - loss: 0.250873
+Accuracy at step 2000: 1.000000 - loss: 0.248543
+Accuracy at step 3000: 1.000000 - loss: 0.244649
+Accuracy at step 4000: 1.000000 - loss: 0.239763
+Accuracy at step 5000: 1.000000 - loss: 0.234076
+Accuracy at step 6000: 1.000000 - loss: 0.226689
+Accuracy at step 7000: 1.000000 - loss: 0.218864
+Accuracy at step 8000: 1.000000 - loss: 0.214159
+Accuracy at step 9000: 1.000000 - loss: 0.210873
+Accuracy at step 10000: 1.000000 - loss: 0.209507
+Accuracy at step 11000: 1.000000 - loss: 0.207625
+Accuracy at step 12000: 1.000000 - loss: 0.206023
+Accuracy at step 13000: 1.000000 - loss: 0.201835
+Accuracy at step 14000: 1.000000 - loss: 0.197809
+testing accuracy: 1.4305000305175781
+testing Loss: 0.19638247787952423
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 0.985347
+Accuracy at step 1000: 1.000000 - loss: 0.244960
+Accuracy at step 2000: 1.000000 - loss: 0.225101
+Accuracy at step 3000: 1.000000 - loss: 0.194685
+Accuracy at step 4000: 1.000000 - loss: 0.171768
+Accuracy at step 5000: 1.000000 - loss: 0.159743
+Accuracy at step 6000: 1.000000 - loss: 0.149101
+Accuracy at step 7000: 1.000000 - loss: 0.141968
+Accuracy at step 8000: 0.000000 - loss: 0.135804
+Accuracy at step 9000: 0.000000 - loss: 0.126303
+Accuracy at step 10000: 0.000000 - loss: 0.120987
+Accuracy at step 11000: 0.000000 - loss: 0.118861
+Accuracy at step 12000: 0.000000 - loss: 0.117395
+Accuracy at step 13000: 0.000000 - loss: 0.116266
+Accuracy at step 14000: 0.000000 - loss: 0.115704
+testing accuracy: 0.6980000138282776
+testing Loss: 0.11461448669433594
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 3.724452
+Accuracy at step 1000: 1.000000 - loss: 0.244043
+Accuracy at step 2000: 1.000000 - loss: 0.231752
+Accuracy at step 3000: 1.000000 - loss: 0.214272
+Accuracy at step 4000: 1.000000 - loss: 0.181084
+Accuracy at step 5000: 0.000000 - loss: 0.142840
+Accuracy at step 6000: 0.000000 - loss: 0.113121
+Accuracy at step 7000: 0.000000 - loss: 0.099723
+Accuracy at step 8000: 0.000000 - loss: 0.089560
+Accuracy at step 9000: 0.000000 - loss: 0.077892
+Accuracy at step 10000: 0.000000 - loss: 0.062401
+Accuracy at step 11000: 0.000000 - loss: 0.057628
+Accuracy at step 12000: 0.000000 - loss: 0.054114
+Accuracy at step 13000: 0.000000 - loss: 0.044650
+Accuracy at step 14000: 0.000000 - loss: 0.038596
+testing accuracy: 0.25
+testing Loss: 0.035664238035678864
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 1.000000 - loss: 0.693261
+Accuracy at step 1000: 1.000000 - loss: 0.223199
+Accuracy at step 2000: 1.000000 - loss: 0.180016
+Accuracy at step 3000: 0.000000 - loss: 0.123259
+Accuracy at step 4000: 0.000000 - loss: 0.080175
+Accuracy at step 5000: 0.000000 - loss: 0.059877
+Accuracy at step 6000: 0.000000 - loss: 0.043253
+Accuracy at step 7000: 0.000000 - loss: 0.023884
+Accuracy at step 8000: 0.000000 - loss: 0.020153
+Accuracy at step 9000: 0.000000 - loss: 0.015918
+Accuracy at step 10000: 0.000000 - loss: 0.007536
+Accuracy at step 11000: 0.000000 - loss: 0.004473
+Accuracy at step 12000: 0.000000 - loss: 0.001245
+Accuracy at step 13000: 0.000000 - loss: 0.000096
+Accuracy at step 14000: 0.000000 - loss: 0.000031
+testing accuracy: 0.0
+testing Loss: 1.6987338312901556e-05
+
+
+
+
+Start of neuron number_layers - 2
+Accuracy at step 0: 2.000000 - loss: 1.032493
+Accuracy at step 1000: 1.000000 - loss: 0.249984
+Accuracy at step 2000: 1.000000 - loss: 0.249984
+Accuracy at step 3000: 1.000000 - loss: 0.249984
+Accuracy at step 4000: 1.000000 - loss: 0.249984
+Accuracy at step 5000: 1.000000 - loss: 0.249984
+Accuracy at step 6000: 1.000000 - loss: 0.249985
+Accuracy at step 7000: 1.000000 - loss: 0.249986
+Accuracy at step 8000: 1.000000 - loss: 0.249984
+Accuracy at step 9000: 1.000000 - loss: 0.249984
+Accuracy at step 10000: 1.000000 - loss: 0.249984
+Accuracy at step 11000: 1.000000 - loss: 0.249986
+Accuracy at step 12000: 1.000000 - loss: 0.249984
+Accuracy at step 13000: 1.000000 - loss: 0.249988
+Accuracy at step 14000: 1.000000 - loss: 0.249985
+testing accuracy: 2.008500099182129
+testing Loss: 0.2500144839286804
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 0.903314
+Accuracy at step 1000: 1.000000 - loss: 0.243555
+Accuracy at step 2000: 1.000000 - loss: 0.236987
+Accuracy at step 3000: 1.000000 - loss: 0.233789
+Accuracy at step 4000: 1.000000 - loss: 0.231483
+Accuracy at step 5000: 1.000000 - loss: 0.229106
+Accuracy at step 6000: 1.000000 - loss: 0.223201
+Accuracy at step 7000: 1.000000 - loss: 0.219190
+Accuracy at step 8000: 1.000000 - loss: 0.216530
+Accuracy at step 9000: 1.000000 - loss: 0.214582
+Accuracy at step 10000: 1.000000 - loss: 0.210365
+Accuracy at step 11000: 1.000000 - loss: 0.207124
+Accuracy at step 12000: 1.000000 - loss: 0.206398
+Accuracy at step 13000: 1.000000 - loss: 0.205974
+Accuracy at step 14000: 1.000000 - loss: 0.205795
+testing accuracy: 1.5959999561309814
+testing Loss: 0.20690926909446716
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 3.000000 - loss: 1.237370
+Accuracy at step 1000: 1.000000 - loss: 0.248611
+Accuracy at step 2000: 1.000000 - loss: 0.241282
+Accuracy at step 3000: 1.000000 - loss: 0.233693
+Accuracy at step 4000: 1.000000 - loss: 0.220318
+Accuracy at step 5000: 1.000000 - loss: 0.211605
+Accuracy at step 6000: 1.000000 - loss: 0.204760
+Accuracy at step 7000: 1.000000 - loss: 0.198103
+Accuracy at step 8000: 1.000000 - loss: 0.190182
+Accuracy at step 9000: 1.000000 - loss: 0.184173
+Accuracy at step 10000: 1.000000 - loss: 0.181728
+Accuracy at step 11000: 1.000000 - loss: 0.180493
+Accuracy at step 12000: 1.000000 - loss: 0.179819
+Accuracy at step 13000: 1.000000 - loss: 0.179301
+Accuracy at step 14000: 1.000000 - loss: 0.178707
+testing accuracy: 1.340000033378601
+testing Loss: 0.1763092279434204
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 1.112838
+Accuracy at step 1000: 1.000000 - loss: 0.243216
+Accuracy at step 2000: 1.000000 - loss: 0.234261
+Accuracy at step 3000: 1.000000 - loss: 0.217540
+Accuracy at step 4000: 1.000000 - loss: 0.207477
+Accuracy at step 5000: 1.000000 - loss: 0.199043
+Accuracy at step 6000: 1.000000 - loss: 0.185279
+Accuracy at step 7000: 1.000000 - loss: 0.176974
+Accuracy at step 8000: 1.000000 - loss: 0.171548
+Accuracy at step 9000: 1.000000 - loss: 0.167825
+Accuracy at step 10000: 1.000000 - loss: 0.160831
+Accuracy at step 11000: 1.000000 - loss: 0.157952
+Accuracy at step 12000: 1.000000 - loss: 0.154808
+Accuracy at step 13000: 1.000000 - loss: 0.153574
+Accuracy at step 14000: 1.000000 - loss: 0.153061
+testing accuracy: 1.152999997138977
+testing Loss: 0.15214227139949799
+
+
+
+
+Start of neuron number_layers - 1
+Accuracy at step 0: 2.000000 - loss: 1.014160
+Accuracy at step 1000: 1.000000 - loss: 0.238252
+Accuracy at step 2000: 1.000000 - loss: 0.215264
+Accuracy at step 3000: 1.000000 - loss: 0.190916
+Accuracy at step 4000: 1.000000 - loss: 0.172081
+Accuracy at step 5000: 1.000000 - loss: 0.155628
+Accuracy at step 6000: 1.000000 - loss: 0.141721
+Accuracy at step 7000: 1.000000 - loss: 0.135064
+Accuracy at step 8000: 1.000000 - loss: 0.132948
+Accuracy at step 9000: 0.000000 - loss: 0.132223
+Accuracy at step 10000: 0.000000 - loss: 0.131982
+Accuracy at step 11000: 0.000000 - loss: 0.131897
+Accuracy at step 12000: 0.000000 - loss: 0.131860
+Accuracy at step 13000: 0.000000 - loss: 0.131838
+Accuracy at step 14000: 0.000000 - loss: 0.131823
+testing accuracy: 0.9854999780654907
+testing Loss: 0.1332785040140152
+
+
+
+
+Start of neuron number_layers - 2
+Accuracy at step 0: 2.000000 - loss: 1.895684
+Accuracy at step 1000: 1.000000 - loss: 0.249984
+Accuracy at step 2000: 1.000000 - loss: 0.249984
+Accuracy at step 3000: 1.000000 - loss: 0.249984
+Accuracy at step 4000: 1.000000 - loss: 0.249984
+Accuracy at step 5000: 1.000000 - loss: 0.249984
+Accuracy at step 6000: 1.000000 - loss: 0.249984
+Accuracy at step 7000: 1.000000 - loss: 0.249984
+Accuracy at step 8000: 1.000000 - loss: 0.249985
+Accuracy at step 9000: 1.000000 - loss: 0.249984
+Accuracy at step 10000: 1.000000 - loss: 0.249985
+Accuracy at step 11000: 1.000000 - loss: 0.249985
+Accuracy at step 12000: 1.000000 - loss: 0.249984
+Accuracy at step 13000: 1.000000 - loss: 0.249985
+Accuracy at step 14000: 1.000000 - loss: 0.249985
+testing accuracy: 2.00600004196167
+testing Loss: 0.2500082850456238
+
+
+
+

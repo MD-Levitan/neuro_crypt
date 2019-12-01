@@ -2,6 +2,12 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 
+input_files={
+    "g1": ("GOST_generator/bin/out_primitive1_x.bin", "GOST_generator/bin/out_primitive1_y.bin"),
+    "g2": ("GOST_generator/bin/out_primitive2_x.bin", "GOST_generator/bin/out_primitive2_y.bin"),
+    "g0": ("GOST_generator/bin/out_primitive0_x.bin", "GOST_generator/bin/out_primitive0_y.bin"),
+
+}
 
 def read_from_file(file, num_bytes, format_data=lambda x: int.from_bytes(x, byteorder='little')):
     data = []
@@ -47,14 +53,14 @@ def xor(x1, x2):
     return list(map(lambda x: x[0] ^ x[1], zip(x1, x2)))
 
 
-def get_test_values_xor():
-    __in = read_from_file("GOST_generator/bin/out_primitive_x.bin", 1,
+def get_test_values_xor(model):
+    __in = read_from_file(input_files[model][0], 1,
                           lambda x: split_by_bit(x, 4))
 
-    __xor = read_from_file("GOST_generator/bin/out_primitive_x.bin", 1,
+    __xor = read_from_file(input_files[model][0], 1,
                           lambda x: split_by_bit(x, 4, order='right'))
 
-    __out = read_from_file("GOST_generator/bin/out_primitive_y.bin", 1,
+    __out = read_from_file(input_files[model][1], 1,
                            lambda x: split_by_bit(x, 4, order='right'))
 
     __out = list(map(lambda x: xor(x[0], x[1]), zip(__out, __xor)))
@@ -62,11 +68,11 @@ def get_test_values_xor():
     return np.array(__in), np.array(__out)
 
 
-def get_test_values():
-    __in = read_from_file("GOST_generator/bin/out_primitive_x.bin", 1,
+def get_test_values(model):
+    __in = read_from_file(input_files[model][0], 1,
                           lambda x: split_by_bit(x, 8))
 
-    __out = read_from_file("GOST_generator/bin/out_primitive_y.bin", 1,
+    __out = read_from_file(input_files[model][1], 1,
                            lambda x: split_by_bit(x, 4, order='right'))
 
     return np.array(__in), np.array(__out)
@@ -249,26 +255,43 @@ def init_network(input_data, output_data, n_input, n_hidden, n_classes, number_l
 
 
 if __name__ == "__main__":
-    input_data, output_data = get_test_values()
 
     # Network Parameters
     n_input = 8
     n_classes = 4
 
-    # x, y = init_one_layer_network(input_data, output_data, n_input, n_classes,
-    #                               training_epochs=15000, display_step=1000)
-    #
-    # x, y = init_network(input_data, output_data, n_input, [8], n_classes, 1,
-    #                     activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
-    #
-    # x, y = init_network(input_data, output_data, n_input, [4], n_classes, 1,
-    #                     activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
+    def experiment(input_data, output_date):
+        x, y = init_one_layer_network(input_data, output_date, n_input, n_classes,
+                                      training_epochs=15000, display_step=1000)
 
-    x, y = init_network(input_data, output_data, n_input, [32], n_classes, 1,
-                        activation=tf.nn.sigmoid, training_epochs=1000, display_step=1000)
+        x, y = init_network(input_data, output_data, n_input, [4], n_classes, 1,
+                            activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
 
-    # x, y = init_network(input_data, output_data, n_input, [16], n_classes, 1,
-    #                     activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
+        x, y = init_network(input_data, output_data, n_input, [8], n_classes, 1,
+                            activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
+
+        x, y = init_network(input_data, output_data, n_input, [16], n_classes, 1,
+                            activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
+
+        x, y = init_network(input_data, output_data, n_input, [32], n_classes, 1,
+                            activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
+
+        x, y = init_network(input_data, output_data, n_input, [32, 32], n_classes, 2,
+                            activation=tf.nn.sigmoid, training_epochs=15000, display_step=1000)
+
+    input_data, output_data = get_test_values(model="g0")
+    print("Experiment g0\n\n")
+    experiment(input_data, output_data)
+    input_data, output_data = get_test_values(model="g1")
+    print("Experiment g1\n\n")
+    experiment(input_data, output_data)
+    input_data, output_data = get_test_values(model="g2")
+    print("Experiment g2\n\n")
+    experiment(input_data, output_data)
+
+
+
+
 
 
 # RESULTS #
