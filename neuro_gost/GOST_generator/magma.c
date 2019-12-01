@@ -405,6 +405,7 @@ void magma_neuro(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0, buf2;
 	
+	printf("%d\n", subkeys->k[0]);
 	buf = f_neuro(n1 + subkeys->k[0]);
 	n2 	= n2 << 21 | n2 >> 11;
 	buf = n2 ^ buf;
