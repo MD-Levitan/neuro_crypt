@@ -528,6 +528,7 @@ Accuracy at step 2000: 1.000000 - loss: 0.241282
 
 Accuracy at step 3000: 1.000000 - loss: 0.233693
 
+
 Accuracy at step 4000: 1.000000 - loss: 0.220318
 
 Accuracy at step 5000: 1.000000 - loss: 0.211605

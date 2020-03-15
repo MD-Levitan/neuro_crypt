@@ -8,6 +8,11 @@ __pycache__/
 
 # Data file
 *.bin
+generator
+
+# Results
+*results/
+
 
 # Tex/Latex extensions
 *.sty

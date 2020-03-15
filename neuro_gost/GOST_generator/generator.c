@@ -276,7 +276,7 @@ int main(int argc, const char **argv) {
 		}
 		case 4:
 		{
-			random_generator_primitive_g1(ctx, size,
+			random_generator_primitive_g0(ctx, size,
 									  "bin/out_primitive0_x.bin",
 									  "bin/out_primitive0_y.bin");
 			break;

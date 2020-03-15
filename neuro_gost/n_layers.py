@@ -193,7 +193,7 @@ def init_network(input_data, output_data, n_input, n_hidden, n_classes, number_l
 
         # print(list(map(lambda x: hex(_int(x)), test_values1)))
         # print(list(map(lambda x: hex(_int(x)), test_values)))
-        #print(list(map(lambda x: hex(_int(x)), test_dataset)))
+        # print(list(map(lambda x: hex(_int(x)), test_dataset)))
 
         accuracy = tf.reduce_mean(tf.cast(hamming_distance, "float"))
         acc = accuracy.eval(feed_dict={x: test_dataset, y: test_values})
