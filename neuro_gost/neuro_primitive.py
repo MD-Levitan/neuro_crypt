@@ -3,11 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 input_files = {
-    "g1": ("GOST_generator/bin/out_primitive1_x.bin", "GOST_generator/bin/out_primitive1_y.bin"),
-    "g2": ("GOST_generator/bin/out_primitive2_x.bin", "GOST_generator/bin/out_primitive2_y.bin"),
-    "g0": ("GOST_generator/bin/out_primitive0_x.bin", "GOST_generator/bin/out_primitive0_y.bin"),
+    "g1": ("GOST_generator/bin/g1_x.bin", "GOST_generator/bin/g1_y.bin"),
+    "g2": ("GOST_generator/bin/g2_x.bin", "GOST_generator/bin/g2_y.bin"),
+    "g0": ("GOST_generator/bin/g0_x.bin", "GOST_generator/bin/g0_y.bin"),
 
 }
+
 
 def read_from_file(file, num_bytes, format_data=lambda x: int.from_bytes(x, byteorder='little')):
     data = []
@@ -69,12 +70,13 @@ def get_test_values_xor(model):
 
 
 def get_test_values1(size=[32, 32]):
-    __in = read_from_file("GOST_generator/bin/out_iterate_x.bin", 8,
+    __in = read_from_file("GOST_generator/bin/g3_x.bin", 8,
                           lambda x: split_by_bit(x, size[0]))
-    __out = read_from_file("GOST_generator/bin/out_iterate_y.bin", 8,
+    __out = read_from_file("GOST_generator/bin/g3_y.bin", 8,
                            lambda x: split_by_bit(x, size[1]))
 
     return np.array(__in), np.array(__out)
+
 
 def get_test_values(model):
     __in = read_from_file(input_files[model][0], 1,
@@ -262,6 +264,88 @@ def init_network(input_data, output_data, n_input, n_hidden, n_classes, number_l
     return acc, los
 
 
+def result_network(input_data, output_data, n_input, n_hidden, n_classes, number_layers, learning_rate=0.001,
+                 training_epochs=100, display_step=10, activation=tf.nn.sigmoid, optimizer=tf.train.AdamOptimizer):
+    with open("log1.txt", "a+") as f:
+        f.write('Start of neuron number_layers - {}\n'.format(number_layers))
+    x = tf.placeholder(tf.float32, [None, n_input])
+    y = tf.placeholder(tf.float32, [None, n_classes])
+
+    # n_hidden = [n_hidden * i for i in range(1, number_layers + 1)]
+    # n_hidden = [n_hidden] * number_layers
+    # n_hidden = [int(sum([binomial(n_input, i)
+    # for i in range(1, level + 1)])) for level in range(1, number_layers + 1)]
+    # n_hidden = [sum([int(binomial(n_input, level))
+    # for level in range(1, number_layers + 1)])] + [n_hidden] * (number_layers - 1)
+
+    prediction = multilayer_perceptron(x, n_hidden, n_classes, number_layers,
+                                       activation_fun=activation, first_activation=True)
+
+    # prediction = __multilayer_perceptron(x,
+    #                                      __generate_weigths(n_input, n_hidden, n_classes, number_layers),
+    #                                      __generate_biases(n_input, n_hidden, n_classes, number_layers),
+    #                                      number_layers)
+
+    hamming_distance = tf.math.count_nonzero(tf.round(prediction) - y, axis=-1)
+    accuracy = tf.reduce_mean(hamming_distance)
+    cost = tf.reduce_mean(tf.square(prediction - y))
+
+    loss = tf.losses.sigmoid_cross_entropy(y, prediction)
+    loss1 = tf.keras.losses.binary_crossentropy(y, prediction)
+
+    loss = cost
+
+    optimizer = optimizer(learning_rate=learning_rate).minimize(loss)
+
+    init = tf.global_variables_initializer()
+
+    with tf.Session() as sess:
+        sess.run(init)
+
+        train_dataset = np.array(input_data[:9 * len(input_data) // 10])
+        train_values = np.array(output_data[: 9 * len(input_data) // 10])
+
+        test_dataset = np.array(input_data[-len(input_data) // 10:])
+        test_values = np.array(output_data[-len(input_data) // 10:])
+
+        for i in range(training_epochs):
+            if i % display_step == 0:
+                feed = {x: train_dataset, y: train_values}
+                result = sess.run([loss, accuracy], feed_dict=feed)
+                with open("log1.txt", "a+") as f:
+                    f.write('Accuracy at step %s: %f - loss: %f\n' % (i, result[1], result[0]))
+                print('Accuracy at step %s: %f - loss: %f\n' % (i, result[1], result[0]))
+            else:
+                feed = {x: train_dataset, y: train_values}
+            sess.run(optimizer, feed_dict=feed)
+
+        print("Optimization Finished!")
+
+        test_values1 = sess.run(prediction, feed_dict={
+            x: test_dataset,
+        })
+
+        print(list(map(lambda x: hex(_int(x)), test_values1)))
+        print(list(map(lambda x: hex(_int(x)), test_values)))
+        print(list(map(lambda x: hex(_int(x)), test_dataset)))
+
+        accuracy = tf.reduce_mean(tf.cast(hamming_distance, "float"))
+        acc = accuracy.eval(feed_dict={x: test_dataset, y: test_values})
+        los = loss.eval(feed_dict={x: test_dataset, y: test_values})
+
+        with open("log1.txt", "a+") as f:
+            f.write("testing accuracy: {}\n".format(acc))
+            f.write("testing Loss: {}\n".format(los))
+            f.write("\n\n\n\n")
+
+        print("testing accuracy: {}".format(acc))
+        print("testing Loss: {}".format(los))
+
+        sess.close()
+
+    return test_values1, test_values, acc
+
+
 def experiment_std(input_data, output_data, n_input, n_classes, training_epochs=15000, display_step=1000):
     x, y = init_one_layer_network(input_data, output_data, n_input, n_classes,
                                   training_epochs=training_epochs, display_step=display_step)
@@ -300,24 +384,58 @@ def experiment_changeable_0l(input_data, output_data, n_input, n_classes, model_
 
 
 def experiment_changeable_1l(input_data, output_data, n_input, n_classes, left_b, right_b, model_name,
-                          activation=tf.nn.sigmoid, training_epochs=10000, display_step=20000):
+                          activation=tf.nn.sigmoid, training_epochs=15000, display_step=20000):
     accurancy = []
     loss = []
     n_hidden = []
-    for i in range(left_b, right_b, 4):
+    for i in range(left_b, right_b + 1, 4):
         x, y = init_network(input_data, output_data, n_input, [i], n_classes, 1,
                             activation=activation, training_epochs=training_epochs, display_step=display_step)
         accurancy.append(n_classes - x)
         loss.append(y)
         n_hidden.append(i)
     create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/acc_" +model_name + "_1layer.png")
+                 "results/acc_" +model_name + "_1.png", range(left_b, right_b + 1, 4))
     create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/los" + model_name + "_1layer.png")
+                 "results/los" + model_name + "_1.png", range(left_b, right_b + 1, 4))
+
+
+def experiment_x(input_data, output_data, n_input, n_layers, n_classes, activation=tf.nn.sigmoid, training_epochs=15000, display_step=20000):
+    left_blocks = []
+    right_blocks = []
+    output_blocks = []
+    real_results = []
+    predict_results = []
+    total_accuracy = 0
+    for i in range(0, 8):
+        left_blocks.append(input_data[:, 4 * i: 4 * i + 4])
+        right_blocks.append(input_data[:, 32 + 4 * i: 32 + 4 * i + 4])
+        output_blocks.append(output_data[:, 4 * i: 4 * i + 4])
+
+    for i in range(0, 8):
+        x, y, z = result_network(np.concatenate((left_blocks[i], right_blocks[i]), axis=1), output_blocks[i], n_input, [n_layers],
+                              n_classes, 1, activation=activation, training_epochs=training_epochs, display_step=display_step)
+        predict_results.append(x)
+        real_results.append(y)
+        total_accuracy += z
+    print(total_accuracy)
+    return total_accuracy
+
+
+def experiment_changeable_x(input_data, output_data, n_input, n_classes, left_b, right_b,
+                          activation=tf.nn.sigmoid, training_epochs=15000, display_step=20000):
+    accurancy = []
+    n_hidden = []
+    for i in range(left_b, right_b + 1, 4):
+        x = experiment_x(input_data, output_data, n_input, i, n_classes)
+        accurancy.append(n_classes * 8 - x)
+        n_hidden.append(i)
+    create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "GOST"),
+                 "results/acc_x_1.png", range(left_b, right_b + 1, 4))
 
 
 def experiment_changeable_2l(input_data, output_data, n_input, n_classes, left_b, right_b, model_name,
-                          activation=tf.nn.sigmoid, training_epochs=10000, display_step=20000):
+                          activation=tf.nn.sigmoid, training_epochs=15000, display_step=20000):
     accurancy = []
     tikcs = []
     loss = []
@@ -333,9 +451,9 @@ def experiment_changeable_2l(input_data, output_data, n_input, n_classes, left_b
             tikcs.append(str((i, j)))
             z += 1
     create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/acc_2l_" + model_name + "_1layer.png", tikcs)
+                 "results/acc_" + model_name + "_2.png", tikcs)
     create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/los_2l_" + model_name + "_1layer.png", tikcs)
+                 "results/los_" + model_name + "_2.png", tikcs)
 
 
 def create_graph(x, y, legend: list, filename: str, ticks=None):
@@ -355,14 +473,17 @@ def create_graph(x, y, legend: list, filename: str, ticks=None):
 
 if __name__ == "__main__":
 
-    # # Network Parameters
-    # n_input = 8
-    # n_classes = 4
-    #
-    #
+    # Network Parameters
+    n_input = 8
+    n_classes = 4
+
+    # model = "g2"
     # input_data, output_data = get_test_values(model="g0")
     # print("Experiment g0\n\n")
-    # experiment_changeable_0l(input_data, output_data, n_input, n_classes, "g0")
+    # experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
+    # experiment_changeable_1l(input_data, output_data, n_input, n_classes, 8, 32, model)
+    # experiment_changeable_2l(input_data, output_data, n_input, n_classes, 8, 32, model)
+
     #
     # input_data, output_data = get_test_values(model="g1")
     # print("Experiment g1\n\n")
@@ -372,13 +493,15 @@ if __name__ == "__main__":
     # print("Experiment g2\n\n")
     # experiment_changeable_0l(input_data, output_data, n_input, n_classes, "g2")
 
-    n_input = 64
-    n_classes = 32
+    n_input = 8
+    n_classes = 4
     input_data, output_data = get_test_values1([64, 32])
     print("Experiment g3\n\n")
-    experiment_changeable_0l(input_data, output_data, n_input, n_classes, "g3")
-    experiment_changeable_1l(input_data, output_data, n_input, n_classes, 8, 32, "g3")
-    experiment_changeable_2l(input_data, output_data, n_input, n_classes, 8, 32, "g3")
+    # experiment_x(input_data, output_data, 8, 4)
+    experiment_changeable_x(input_data, output_data, n_input, n_classes, 8, 32)
+    # experiment_changeable_0l(input_data, output_data, n_input, n_classes, "g3")
+    # experiment_changeable_1l(input_data, output_data, n_input, n_classes, 8, 32, "g3")
+    # experiment_changeable_2l(input_data, output_data, n_input, n_classes, 8, 32, "g3")
 
 # RESULTS #
 # 2. Key = 0

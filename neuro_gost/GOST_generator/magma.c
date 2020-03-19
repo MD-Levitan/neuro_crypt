@@ -37,18 +37,6 @@ void delete_tfm_ctx(struct crypto_tfm *tfm)
 	free(tfm);
 }
 
-#define GETU32_BE(pt) (\
-	((uint32_t)(pt)[0] << 24) | \
-	((uint32_t)(pt)[1] << 16) | \
-	((uint32_t)(pt)[2] <<  8) | \
-	((uint32_t)(pt)[3]) )
-
-/* This function checks whether CPU supports Intel's instruction BSWAP.
-   If so, this instruction will be used, portable code otherwise. */
-#ifndef BSWAP32
-#define BSWAP32(n) __builtin_bswap32(n)
-#endif
-
 static unsigned char const k8[16] = {
 	14,  4, 13,  1,  2, 15, 11,  8,  3, 10,  6, 12,  5,  9,  0,  7 }; 
 static unsigned char const k7[16] = {
@@ -449,6 +437,13 @@ void magma_neuro_g0(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uin
 	((uint32_t*)out)[1] = n1;	
 }
 
+void magma_neuro_g0_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	
+	*y = n1 ^ n2;
+	
+}
+
 void magma_neuro_g1(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
@@ -467,6 +462,16 @@ void magma_neuro_g1(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uin
 
 	((uint32_t*)out)[0] = buf;
 	((uint32_t*)out)[1] = n1;	
+}
+
+void magma_neuro_g1_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
+	uint32_t buf = 0;
+
+	//buf = f_neuro_g1(n1, 0);
+	buf = f_neuro_g2(n1);
+	*y = buf ^ n2;
 }
 
 void magma_neuro_g2(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
@@ -488,6 +493,25 @@ void magma_neuro_g2(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uin
 	((uint32_t*)out)[0] = buf;
 	((uint32_t*)out)[1] = n1;	
 }
+
+void magma_neuro_g2_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
+	uint32_t buf = 0;
+
+	buf = f_neuro_g1(n1, subkeys->k[0]);
+	*y = buf ^ n2;
+}
+
+void magma_neuro_g3_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
+	uint32_t buf = 0;
+
+	buf = f_neuro_g2(n1 + subkeys->k[0]);
+	*y = buf ^ n2;
+}
+
 
 void magma_it(struct crypto_tfm *tfm, uint8_t *out,
 					 const uint8_t *in, uint8_t iter)
