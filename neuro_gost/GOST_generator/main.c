@@ -1,4 +1,5 @@
 #include "generator.h"
+#include "feistel.h"
 
 const char *usage = "Usage:  ./generator <SIZE> <GEN_TYPE> <MODEL> [INPUT] [OUTPUT]";
 
@@ -23,7 +24,7 @@ int main(int argc, const char **argv)
     uint64_t size = 0;
     generator_type_t *model, *generator;
 
-    struct crypto_tfm *ctx;
+    crypto_tfm ctx;
 
     size = strtoll(argv[1], NULL, 10);
     gen_name = argv[2];
@@ -35,10 +36,6 @@ int main(int argc, const char **argv)
         output_file = argv[5];
     }
 
-    ctx = create_tfm_ctx();
-    generate_random_key(key);
-    magma_setkey(ctx, key, sizeof(key));
-
     model = get_model_by_name(model_name);
     generator = get_generator_by_name(gen_name);
 
@@ -48,15 +45,34 @@ int main(int argc, const char **argv)
         printf("%s!\n", usage);
         print_generators();
         print_models();
-        delete_tfm_ctx(ctx);
         return -1;
     }
+    generate_random_key(key);
+
+    if (model->suite = MAGMA)
+    {
+        ctx.magma = create_magma_ctx();
+        magma_setkey(ctx.magma, key, sizeof(key));
+    }
+    else
+    {
+        ctx.feistel = create_feistel_ctx(1, 1);
+        feistel_setkey(ctx.feistel, key, sizeof(key));
+    }
+
     input_file = input_file ? input_file : model->default_input;
     output_file = output_file ? output_file : model->default_output;
 
     printf("Generate sequence with following params:\n\tgenerator - %s\n\tmodel - %s\n\tsize - %lld\n\tinput - %s\n\toutput - %s\n",
            generator->name, model->name, size, input_file, output_file);
-    generator->func.gen_func(ctx, size, input_file, output_file, model->func.gen_model_func);
+    generator->func.gen_func(&ctx, size, input_file, output_file, model->func.gen_model_func);
 
-    delete_tfm_ctx(ctx);
+    if (model->suite = MAGMA)
+    {
+        delete_magma_ctx(ctx.magma);
+    }
+    else
+    {
+        delete_feistel_ctx(ctx.feistel);
+    }
 }
