@@ -2,7 +2,6 @@
  * magma.c
  *
  */
- 
 
 #include <memory.h>
 #include <stdlib.h>
@@ -10,15 +9,18 @@
 
 #include "magma.h"
 
-struct magma_subkeys{
+struct magma_subkeys
+{
 	uint32_t k[8];
 };
 
-struct crypto_tfm {
+struct crypto_tfm
+{
 	magma_subkeys *keys;
 };
 
-struct magma_subkeys *crypto_tfm_ctx(struct crypto_tfm *tfm) {
+struct magma_subkeys *crypto_tfm_ctx(struct crypto_tfm *tfm)
+{
 	return tfm->keys;
 }
 
@@ -31,29 +33,28 @@ struct crypto_tfm *create_tfm_ctx()
 
 void delete_tfm_ctx(struct crypto_tfm *tfm)
 {
-	memset((uint8_t*)tfm->keys->k, 0, 8 * sizeof(uint32_t));
+	memset((uint8_t *)tfm->keys->k, 0, 8 * sizeof(uint32_t));
 	free(tfm->keys);
 	tfm->keys = NULL;
 	free(tfm);
 }
 
 static unsigned char const k8[16] = {
-	14,  4, 13,  1,  2, 15, 11,  8,  3, 10,  6, 12,  5,  9,  0,  7 }; 
+	14, 4, 13, 1, 2, 15, 11, 8, 3, 10, 6, 12, 5, 9, 0, 7};
 static unsigned char const k7[16] = {
-	15,  1,  8, 14,  6, 11,  3,  4,  9,  7,  2, 13, 12,  0,  5, 10 };
+	15, 1, 8, 14, 6, 11, 3, 4, 9, 7, 2, 13, 12, 0, 5, 10};
 static unsigned char const k6[16] = {
-	10,  0,  9, 14,  6,  3, 15,  5,  1, 13, 12,  7, 11,  4,  2,  8 };
+	10, 0, 9, 14, 6, 3, 15, 5, 1, 13, 12, 7, 11, 4, 2, 8};
 static unsigned char const k5[16] = {
-	 7, 13, 14,  3,  0,  6,  9, 10,  1,  2,  8,  5, 11, 12,  4, 15 };
+	7, 13, 14, 3, 0, 6, 9, 10, 1, 2, 8, 5, 11, 12, 4, 15};
 static unsigned char const k4[16] = {
-	 2, 12,  4,  1,  7, 10, 11,  6,  8,  5,  3, 15, 13,  0, 14,  9 };
+	2, 12, 4, 1, 7, 10, 11, 6, 8, 5, 3, 15, 13, 0, 14, 9};
 static unsigned char const k3[16] = {
-	12,  1, 10, 15,  9,  2,  6,  8,  0, 13,  3,  4, 14,  7,  5, 11 };
+	12, 1, 10, 15, 9, 2, 6, 8, 0, 13, 3, 4, 14, 7, 5, 11};
 static unsigned char const k2[16] = {
-	 4, 11,  2, 14, 15,  0,  8, 13,  3, 12,  9,  7,  5, 10,  6,  1 };
+	4, 11, 2, 14, 15, 0, 8, 13, 3, 12, 9, 7, 5, 10, 6, 1};
 static unsigned char const k1[16] = {
-	13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12,  7 };
-
+	13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7};
 
 /* Compressed and already rotated s-boxes */
 static uint32_t pi87[256] = {
@@ -99,8 +100,7 @@ static uint32_t pi87[256] = {
 	0x000005d8, 0x00000580, 0x000005e8, 0x000005d0, 0x00000598, 0x000005b8,
 	0x00000140, 0x00000170, 0x00000110, 0x00000128, 0x00000130, 0x00000148,
 	0x00000108, 0x00000160, 0x00000178, 0x00000120, 0x00000158, 0x00000100,
-	0x00000168, 0x00000150, 0x00000118, 0x00000138
-};
+	0x00000168, 0x00000150, 0x00000118, 0x00000138};
 
 static uint32_t pi65[256] = {
 	0xb8000002, 0xf8000002, 0xa8000002, 0xd0000002, 0xc0000002, 0x88000002,
@@ -145,8 +145,7 @@ static uint32_t pi65[256] = {
 	0x18000007, 0x70000007, 0x58000007, 0x20000007, 0x10000007, 0x60000007,
 	0x38000000, 0x78000000, 0x28000000, 0x50000000, 0x40000000, 0x08000000,
 	0x30000000, 0x68000000, 0x00000000, 0x48000000, 0x18000000, 0x70000000,
-	0x58000000, 0x20000000, 0x10000000, 0x60000000
-};
+	0x58000000, 0x20000000, 0x10000000, 0x60000000};
 
 static uint32_t pi43[256] = {
 	0x06580000, 0x06180000, 0x06280000, 0x06400000, 0x06100000, 0x06780000,
@@ -191,8 +190,7 @@ static uint32_t pi43[256] = {
 	0x04b80000, 0x04a00000, 0x04e00000, 0x04c80000, 0x04b00000, 0x04800000,
 	0x05d80000, 0x05980000, 0x05a80000, 0x05c00000, 0x05900000, 0x05f80000,
 	0x05d00000, 0x05e80000, 0x05f00000, 0x05880000, 0x05b80000, 0x05a00000,
-	0x05e00000, 0x05c80000, 0x05b00000, 0x05800000
-};
+	0x05e00000, 0x05c80000, 0x05b00000, 0x05800000};
 
 static uint32_t pi21[256] = {
 	0x00036000, 0x00032000, 0x00033000, 0x00031000, 0x00035000, 0x00032800,
@@ -237,26 +235,24 @@ static uint32_t pi21[256] = {
 	0x00006800, 0x00003800, 0x00000000, 0x00001800, 0x00007800, 0x00000800,
 	0x0007e000, 0x0007a000, 0x0007b000, 0x00079000, 0x0007d000, 0x0007a800,
 	0x0007d800, 0x0007c800, 0x0007f000, 0x0007c000, 0x0007e800, 0x0007b800,
-	0x00078000, 0x00079800, 0x0007f800, 0x00078800
-};
+	0x00078000, 0x00079800, 0x0007f800, 0x00078800};
 
 inline static uint32_t f(uint32_t x)
 {
-	return	pi87[x>>24 & 0xff] | pi65[x>>16 & 0xff] |
-		pi43[x>> 8 & 0xff] | pi21[x & 0xff];
+	return pi87[x >> 24 & 0xff] | pi65[x >> 16 & 0xff] |
+		   pi43[x >> 8 & 0xff] | pi21[x & 0xff];
 }
 /* Slower version of previuos function */
 inline static uint32_t _f(uint32_t x)
 {
-	x = k8[x>>28 & 15] << 28 | k7[x>>24 & 15] << 24 |
-	    k6[x>>20 & 15] << 20 | k5[x>>16 & 15] << 16 |
-	    k4[x>>12 & 15] << 12 | k3[x>> 8 & 15] <<  8 |
-	    k2[x>> 4 & 15] <<  4 | k1[x     & 15];
+	x = k8[x >> 28 & 15] << 28 | k7[x >> 24 & 15] << 24 |
+		k6[x >> 20 & 15] << 20 | k5[x >> 16 & 15] << 16 |
+		k4[x >> 12 & 15] << 12 | k3[x >> 8 & 15] << 8 |
+		k2[x >> 4 & 15] << 4 | k1[x & 15];
 
 	/* Rotate left 11 bits */
-	return x<<11 | x>>(32-11);
+	return x << 11 | x >> (32 - 11);
 }
-
 
 /* neuro  primitive without rotation*/
 inline static uint32_t f_neuro_g1(uint32_t x, uint32_t key)
@@ -264,11 +260,11 @@ inline static uint32_t f_neuro_g1(uint32_t x, uint32_t key)
 	uint8_t buf, buf1;
 	// printf("x: %llx\n", x);
 	// printf("key: %llx\n", key);
-	for (size_t i = 0; i < 8; i+=2)
+	for (size_t i = 0; i < 8; i += 2)
 	{
 		// printf("x_: %x\n", (x >> (4 * i) & 15));
 		// printf("key_: %x\n", (key >> (4 * i) & 15));
-		
+
 		// printf("x_: %x\n", (x >> (4 * i + 4) & 15));
 		// printf("key_: %x\n", (key >> (4 * i + 4) & 15));
 
@@ -277,31 +273,31 @@ inline static uint32_t f_neuro_g1(uint32_t x, uint32_t key)
 		// printf("buf: %x\n", buf);
 		// printf("buf1: %x\n", buf1);
 		// printf("sum: %lx\n", buf | (buf1 << 4));
-		
+
 		((uint8_t *)&x)[i / 2] = buf | (buf1 << 4);
 	}
 	// printf("x: %llx\n", x);
-	x = k8[x>>28 & 15] << 28 | k7[x>>24 & 15] << 24 |
-	    k6[x>>20 & 15] << 20 | k5[x>>16 & 15] << 16 |
-	    k4[x>>12 & 15] << 12 | k3[x>> 8 & 15] <<  8 |
-	    k2[x>> 4 & 15] <<  4 | k1[x     & 15];
+	x = k8[x >> 28 & 15] << 28 | k7[x >> 24 & 15] << 24 |
+		k6[x >> 20 & 15] << 20 | k5[x >> 16 & 15] << 16 |
+		k4[x >> 12 & 15] << 12 | k3[x >> 8 & 15] << 8 |
+		k2[x >> 4 & 15] << 4 | k1[x & 15];
 }
 
 /* neuro  primitive without rotation*/
 inline static uint32_t f_neuro_g2(uint32_t x)
 {
-	x = k8[x>>28 & 15] << 28 | k7[x>>24 & 15] << 24 |
-	    k6[x>>20 & 15] << 20 | k5[x>>16 & 15] << 16 |
-	    k4[x>>12 & 15] << 12 | k3[x>> 8 & 15] <<  8 |
-	    k2[x>> 4 & 15] <<  4 | k1[x     & 15];
+	x = k8[x >> 28 & 15] << 28 | k7[x >> 24 & 15] << 24 |
+		k6[x >> 20 & 15] << 20 | k5[x >> 16 & 15] << 16 |
+		k4[x >> 12 & 15] << 12 | k3[x >> 8 & 15] << 8 |
+		k2[x >> 4 & 15] << 4 | k1[x & 15];
 }
 
 int magma_setkey(struct crypto_tfm *tfm, const uint8_t *key,
-			unsigned int key_len)
+				 unsigned int key_len)
 {
 	if (key_len != 32)
 		return 1;
-	
+
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	subkeys->k[0] = GETU32_BE(key);
 	subkeys->k[1] = GETU32_BE(key + 4);
@@ -316,7 +312,7 @@ int magma_setkey(struct crypto_tfm *tfm, const uint8_t *key,
 }
 
 void magma_encrypt(struct crypto_tfm *tfm, uint8_t *out,
-			  const uint8_t *in)
+				   const uint8_t *in)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
@@ -358,16 +354,16 @@ void magma_encrypt(struct crypto_tfm *tfm, uint8_t *out,
 	n2 ^= f(n1 + subkeys->k[1]);
 	n1 ^= f(n2 + subkeys->k[0]);
 
-	#ifdef __LITTLE_ENDIAN
+#ifdef __LITTLE_ENDIAN
 	n1 = BSWAP32(n1);
 	n2 = BSWAP32(n2);
-	#endif
-	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;
+#endif
+	((uint32_t *)out)[0] = n1;
+	((uint32_t *)out)[1] = n2;
 }
 
 void _magma_encrypt(struct crypto_tfm *tfm, uint8_t *out,
-			  const uint8_t *in)
+					const uint8_t *in)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
@@ -409,12 +405,12 @@ void _magma_encrypt(struct crypto_tfm *tfm, uint8_t *out,
 	n2 ^= _f(n1 + subkeys->k[1]);
 	n1 ^= _f(n2 + subkeys->k[0]);
 
-	#ifdef __LITTLE_ENDIAN
+#ifdef __LITTLE_ENDIAN
 	n1 = BSWAP32(n1);
 	n2 = BSWAP32(n2);
-	#endif
-	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;
+#endif
+	((uint32_t *)out)[0] = n1;
+	((uint32_t *)out)[1] = n2;
 }
 
 void magma_neuro_g0(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
@@ -423,25 +419,24 @@ void magma_neuro_g0(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uin
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0, buf2;
-	
+
 	buf = n1;
-	n2 	= n2 << 21 | n2 >> 11;
+	n2 = n2 << 21 | n2 >> 11;
 	buf = n2 ^ buf;
-	
+
 	*x = BSWAP32(n2);
- 	*y = BSWAP32(buf);
+	*y = BSWAP32(buf);
 
 	buf = buf << 11 | buf >> (32 - 11);
 
-	((uint32_t*)out)[0] = buf;
-	((uint32_t*)out)[1] = n1;	
+	((uint32_t *)out)[0] = buf;
+	((uint32_t *)out)[1] = n1;
 }
 
 void magma_neuro_g0_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
 {
-	
+
 	*y = n1 ^ n2;
-	
 }
 
 void magma_neuro_g1(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uint32_t *x, uint32_t *y)
@@ -450,18 +445,18 @@ void magma_neuro_g1(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uin
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0, buf2;
-	
+
 	buf = f_neuro_g1(n1, subkeys->k[0]);
-	n2 	= n2 << 21 | n2 >> 11;
+	n2 = n2 << 21 | n2 >> 11;
 	buf = n2 ^ buf;
-	
+
 	*x = BSWAP32(n2);
- 	*y = BSWAP32(buf);
+	*y = BSWAP32(buf);
 
 	buf = buf << 11 | buf >> (32 - 11);
 
-	((uint32_t*)out)[0] = buf;
-	((uint32_t*)out)[1] = n1;	
+	((uint32_t *)out)[0] = buf;
+	((uint32_t *)out)[1] = n1;
 }
 
 void magma_neuro_g1_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
@@ -480,18 +475,18 @@ void magma_neuro_g2(struct crypto_tfm *tfm, uint8_t *out, const uint8_t *in, uin
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0, buf2;
-	
+
 	buf = f_neuro_g2(n1 + subkeys->k[0]);
-	n2 	= n2 << 21 | n2 >> 11;
+	n2 = n2 << 21 | n2 >> 11;
 	buf = n2 ^ buf;
-	
+
 	*x = BSWAP32(n2);
- 	*y = BSWAP32(buf);
+	*y = BSWAP32(buf);
 
 	buf = buf << 11 | buf >> (32 - 11);
 
-	((uint32_t*)out)[0] = buf;
-	((uint32_t*)out)[1] = n1;	
+	((uint32_t *)out)[0] = buf;
+	((uint32_t *)out)[1] = n1;
 }
 
 void magma_neuro_g2_primitive(struct crypto_tfm *tfm, const uint32_t n1, const uint32_t n2, uint32_t *y)
@@ -512,82 +507,84 @@ void magma_neuro_g3_primitive(struct crypto_tfm *tfm, const uint32_t n1, const u
 	*y = buf ^ n2;
 }
 
-
 void magma_it(struct crypto_tfm *tfm, uint8_t *out,
-					 const uint8_t *in, uint8_t iter)
+			  const uint8_t *in, uint8_t iter)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0;
-	
-	if (iter >= 23)	{
+
+	if (iter >= 23)
+	{
 		buf = n2 ^ f(n1 + subkeys->k[7 - iter % 8]);
 	}
-	else {
+	else
+	{
 		buf = n2 ^ f(n1 + subkeys->k[iter % 8]);
 	}
 	n2 = n1;
 	n1 = buf;
 	buf = 0;
-	
-	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;	
+
+	((uint32_t *)out)[0] = n1;
+	((uint32_t *)out)[1] = n2;
 }
 
 void _magma_it(struct crypto_tfm *tfm, uint8_t *out,
-					 const uint8_t *in, uint8_t iter)
+			   const uint8_t *in, uint8_t iter)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0;
-		
-	if (iter >= 23)	{
+
+	if (iter >= 23)
+	{
 		buf = n2 ^ _f(n1 + subkeys->k[7 - iter % 8]);
 	}
-	else {
+	else
+	{
 		buf = n2 ^ _f(n1 + subkeys->k[iter % 8]);
 	}
-	
+
 	n2 = n1;
 	n1 = buf;
 	buf = 0;
-	
-	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;	
+
+	((uint32_t *)out)[0] = n1;
+	((uint32_t *)out)[1] = n2;
 }
 
 void magma_it_n(struct crypto_tfm *tfm, uint8_t *out,
-					 const uint8_t *in, uint8_t num)
+				const uint8_t *in, uint8_t num)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
 	uint32_t n1 = GETU32_BE(in + 4);
 	uint32_t buf = 0;
 
-	for(uint8_t it = 0; it < num; ++it)
+	for (uint8_t it = 0; it < num; ++it)
 	{
-		
-		buf = n2 ^ f(n1 + subkeys->k[(it >=23) ? (7 - it % 8) : (it % 8)]);
+
+		buf = n2 ^ f(n1 + subkeys->k[(it >= 23) ? (7 - it % 8) : (it % 8)]);
 		n2 = n1;
 		n1 = buf;
 	}
-	
+
 	if (num % 2)
 	{
 		n1 ^= n2;
 		n2 ^= n1;
 		n1 ^= n2;
 	}
-	
-	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;
-	
+
+	((uint32_t *)out)[0] = n1;
+	((uint32_t *)out)[1] = n2;
 }
 
 void magma_decrypt(struct crypto_tfm *tfm, uint8_t *out,
-			  const uint8_t *in)
+				   const uint8_t *in)
 {
 	magma_subkeys *subkeys = crypto_tfm_ctx(tfm);
 	uint32_t n2 = GETU32_BE(in);
@@ -629,13 +626,10 @@ void magma_decrypt(struct crypto_tfm *tfm, uint8_t *out,
 	n2 ^= f(n1 + subkeys->k[1]);
 	n1 ^= f(n2 + subkeys->k[0]);
 
-	#ifdef __LITTLE_ENDIAN
+#ifdef __LITTLE_ENDIAN
 	n1 = BSWAP32(n1);
 	n2 = BSWAP32(n2);
-	#endif
-	((uint32_t*)out)[0] = n1;
-	((uint32_t*)out)[1] = n2;
+#endif
+	((uint32_t *)out)[0] = n1;
+	((uint32_t *)out)[1] = n2;
 }
-
-
-
