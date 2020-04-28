@@ -19,6 +19,9 @@ generator
 *.toc
 *.aux
 *.gz
+*.stu
+*.png
+*.bin
 
 # Distribution / packaging
 .Python
@@ -60,6 +63,7 @@ coverage.xml
 *.cover
 .hypothesis/
 .pytest_cache/
+*.vscode/
 
 # Translations
 *.mo
