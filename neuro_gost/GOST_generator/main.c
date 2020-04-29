@@ -22,9 +22,10 @@ int main(int argc, const char **argv)
     const char *model_name, *gen_name;
     const char *input_file = NULL, *output_file = NULL;
     uint64_t size = 0;
-    generator_type_t *model, *generator;
+    generator_type_t *generator;
+    model_type_t *model;
 
-    crypto_tfm ctx;
+    crypto_tfm *ctx;
 
     size = strtoll(argv[1], NULL, 10);
     gen_name = argv[2];
@@ -49,30 +50,15 @@ int main(int argc, const char **argv)
     }
     generate_random_key(key);
 
-    if (model->suite = MAGMA)
-    {
-        ctx.magma = create_magma_ctx();
-        magma_setkey(ctx.magma, key, sizeof(key));
-    }
-    else
-    {
-        ctx.feistel = create_feistel_ctx(1, 1);
-        feistel_setkey(ctx.feistel, key, sizeof(key));
-    }
+    ctx = create_crypto_tfm(model->suite, &model->params);
+    setkey_crypto_tfm(model->suite, ctx, key, 32);
 
     input_file = input_file ? input_file : model->default_input;
     output_file = output_file ? output_file : model->default_output;
 
     printf("Generate sequence with following params:\n\tgenerator - %s\n\tmodel - %s\n\tsize - %lld\n\tinput - %s\n\toutput - %s\n",
            generator->name, model->name, size, input_file, output_file);
-    generator->func.gen_func(&ctx, size, input_file, output_file, model->func.gen_model_func);
+    generator->gen_func(ctx, size, (const char *)input_file, (const char *)output_file, model->gen_model_func);
 
-    if (model->suite = MAGMA)
-    {
-        delete_magma_ctx(ctx.magma);
-    }
-    else
-    {
-        delete_feistel_ctx(ctx.feistel);
-    }
+    delete_crypto_tfm(model->suite, ctx);
 }

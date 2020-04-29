@@ -19,7 +19,7 @@ void delete_feistel_ctx(crypto_feistel_ctx *ctx)
 {
     free(ctx->keys);
     free(ctx);
-    //ctx = NULL;
+    ctx = NULL;
 }
 
 /* Keys schedule from model page*/
@@ -35,7 +35,7 @@ void schedule(crypto_feistel_ctx *ctx, const uint8_t *key, unsigned int key_len)
 int feistel_setkey(crypto_feistel_ctx *ctx, const uint8_t *key, unsigned int key_len)
 {
     schedule(ctx, key, key_len);
-    return 1;
+    return 0;
 }
 
 inline static uint8_t f(uint8_t x)
@@ -43,7 +43,7 @@ inline static uint8_t f(uint8_t x)
     uint8_t res;
     res = k2[x >> 4 & 15] << 4 | k1[x & 15];
 
-    return x;
+    return res;
 }
 
 inline static uint8_t shift(uint8_t x, uint8_t sh)
@@ -60,8 +60,11 @@ void feistel_generate(crypto_feistel_ctx *ctx, uint8_t *out, const uint8_t *in)
 
     for (uint8_t index = 0; index < ctx->it; index++)
     {
+        //printf("Before sum %d - %d", x2, ctx->keys[index].key);
         uint8_t var = x2 + ctx->keys[index].key;
+        //printf("\tAfter sum %d", var);
         var = f(var);
+        //printf("\tAfter table %d\n", var);
         var = shift(var, ctx->shift);
         y1 = x2;
         y2 = var ^ x1;

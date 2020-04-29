@@ -167,12 +167,12 @@ if __name__ == "__main__":
     n_input = 16
     n_classes = 16
 
-    model = "f0"
+    model = "f7"
     input_data, output_data = get_test_data(model=model)
 
-    experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
-    experiment_changeable_1l(input_data, output_data, n_input, n_classes, 8, 32, model)
-    experiment_changeable_2l(input_data, output_data, n_input, n_classes, 8, 32, model)
+    #experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
+    experiment_changeable_1l(input_data, output_data, n_input, n_classes, 16, 32, model, training_epochs=50000)
+    #experiment_changeable_2l(input_data, output_data, n_input, n_classes, 8, 32, model)
 
     #
     # input_data, output_data = get_test_values(model="g1")

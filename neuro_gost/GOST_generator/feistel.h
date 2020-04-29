@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 typedef struct feistel_subkeys feistel_subkeys;
 typedef struct crypto_feistel_ctx crypto_feistel_ctx;

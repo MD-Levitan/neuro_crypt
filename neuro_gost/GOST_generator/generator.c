@@ -12,18 +12,18 @@ void generate_random_key(uint8_t *key)
 	srand(time(NULL));
 	for (uint8_t i = 0; i < 32; ++i)
 	{
-		key[i] = rand();
+		key[i] = 0x86; //rand();
 	}
 }
 
 void print_models()
 {
 	printf("Models:\n\n");
-	for (uint8_t i = 0; i < sizeof(model_generators) / sizeof(model_generators[0]); ++i)
+	for (uint8_t i = 0; i < sizeof(models) / sizeof(models[0]); ++i)
 	{
 		printf("\t%s\t-\t%s (default files: %s, %s)\n",
-			   model_generators[i].name, model_generators[i].description,
-			   model_generators[i].default_input, model_generators[i].default_output);
+			   models[i].name, models[i].description,
+			   models[i].default_input, models[i].default_output);
 	}
 	printf("\n");
 }
@@ -38,8 +38,26 @@ void print_generators()
 	printf("\n");
 }
 
-generator_type_t *get_type_by_name(const char *name, generator_type_t *list, uint8_t size)
+generator_type_t *get_generator_by_name(const char *name)
 {
+	size_t size = sizeof(generators) / sizeof(generators[0]);
+	generator_type_t *list = generators;
+
+	for (uint8_t i = 0; i < size; ++i)
+	{
+		if (strcmp(list[i].name, name) == 0)
+		{
+			return &list[i];
+		}
+	}
+	return NULL;
+}
+
+model_type_t *get_model_by_name(const char *name)
+{
+	size_t size = sizeof(models) / sizeof(models[0]);
+	model_type_t *list = models;
+
 	for (uint8_t i = 0; i < size; ++i)
 	{
 		if (strcmp(list[i].name, name) == 0)
@@ -52,7 +70,7 @@ generator_type_t *get_type_by_name(const char *name, generator_type_t *list, uin
 
 /* Consecutive generator */
 void iterate_generator(crypto_tfm *ctx, uint64_t size,
-					   char *filename_x, char *filename_y,
+					   const char *filename_x, const char *filename_y,
 					   void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
 	FILE *out_file_x, *out_file_y;
@@ -78,7 +96,7 @@ void iterate_generator(crypto_tfm *ctx, uint64_t size,
 
 /* Consecutive generator */
 void iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
-								char *filename_x, char *filename_y,
+								const char *filename_x, const char *filename_y,
 								void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
 
@@ -114,7 +132,7 @@ void iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
 
 /* Random generator */
 void random_generator(crypto_tfm *ctx, uint64_t size,
-					  char *filename_x, char *filename_y,
+					  const char *filename_x, const char *filename_y,
 					  void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
 	FILE *out_file_x, *out_file_y;
@@ -145,7 +163,7 @@ void random_generator(crypto_tfm *ctx, uint64_t size,
 
 /* Consecutive generator with random order */
 void random_iterate_generator(crypto_tfm *ctx, uint64_t size,
-							  char *filename_x, char *filename_y,
+							  const char *filename_x, const char *filename_y,
 							  void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
 	FILE *out_file_x, *out_file_y;
@@ -195,7 +213,7 @@ void random_iterate_generator(crypto_tfm *ctx, uint64_t size,
 
 // /* Consecutive generator with random order*/
 // void random_iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
-// 					  		  		   char *filename_x, char *filename_y,
+// 					  		  		   const char *filename_x, const char *filename_y,
 // 					  		           void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 // {
 // 	FILE *out_file_x, *out_file_y;
@@ -457,7 +475,7 @@ void feistel_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint
 {
 	uint16_t out;
 
-	feistel_generate(ctx->feistel, &out, &in);
+	feistel_generate(ctx->feistel, (int8_t *)&out, (int8_t *)&in);
 	//out = SWAP_32(y);
 
 	fwrite((uint8_t *)&in, sizeof(uint8_t), 2, out_file_x);
