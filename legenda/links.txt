@@ -1,8 +1,0 @@
-1. http://www.jessicayung.com/explaining-tensorflow-code-for-a-multilayer-perceptron/
-2. https://github.com/Kulbear/deep-learning-nano-foundation/wiki/ReLU-and-Softmax-Activation-Functions
-3. https://www.guru99.com/rnn-tutorial.html
-4. https://www.guru99.com/artificial-neural-network-tutorial.html
-5. https://medium.com/@curiousily/tensorflow-for-hackers-part-ii-building-simple-neural-network-2d6779d2f91b
-
-6. http://cryptowiki.net/index.php?title=Neural_networks_in_cryptography
-7. https://cs.ndsu.edu/~siludwig/Publish/papers/NaBIC2017.pdf
