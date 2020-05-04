@@ -82,5 +82,16 @@ def to_int(bit_array):
     value = 0
     for i in bit_array:
         value *= 2
-        value += i
+        value += round(i)
     return int(value)
+
+
+def hamming_distance(x: int, y: int):
+    var = x ^ y
+    distance = 0
+    while var:
+        if var % 2:
+            distance += 1
+        var >>= 1
+    return distance
+

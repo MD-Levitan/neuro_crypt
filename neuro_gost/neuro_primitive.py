@@ -29,6 +29,8 @@ models = {
            lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
     "f7": ("GOST_generator/bin/f7_x.bin", "GOST_generator/bin/f7_y.bin",
            lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
+    "f0-2": ("GOST_generator/bin/f0-2_x.bin", "GOST_generator/bin/f0-2_y.bin",
+           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
 }
 
 
@@ -73,21 +75,80 @@ def experiment_changeable_0l(input_data, output_data, n_input, n_classes, model_
                  "results/los" + model_name + "_0.png")
 
 
-def experiment_changeable_1l(input_data, output_data, n_input, n_classes, left_b, right_b, model_name,
+def experiment_changeable_1l(input_data, output_data, n_input, n_classes, n_neurons, model_name,
                              training_epochs=15000, display_step=20000):
     accurancy = []
     loss = []
     n_hidden = []
-    for i in range(left_b, right_b + 1, 4):
+    for i in n_neurons:
         x, y, _, _ = networks.init_multilayer_network(input_data, output_data, n_input, [i], n_classes, 1,
                                                       training_epochs=training_epochs, display_step=display_step)
         accurancy.append(n_classes - x)
         loss.append(y)
         n_hidden.append(i)
     create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/acc_" + model_name + "_1.png", range(left_b, right_b + 1, 4))
+                 "results/acc_" + model_name + "_1.png", n_neurons)
     create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/los" + model_name + "_1.png", range(left_b, right_b + 1, 4))
+                 "results/los" + model_name + "_1.png", n_neurons)
+
+
+def experiment_changeable_2l(input_data, output_data, n_input, n_classes, n_nerouns, model_name,
+                             training_epochs=15000, display_step=20000):
+    accurancy = []
+    tikcs = []
+    loss = []
+    n_hidden = []
+    z = 0
+    for neurons in n_nerouns:
+        x, y, _, _ = networks.init_multilayer_network(input_data, output_data, n_input, neurons, n_classes, 2,
+                                                      training_epochs=training_epochs, display_step=display_step)
+        accurancy.append(n_classes - x)
+        loss.append(y)
+        n_hidden.append(z)
+        tikcs.append(str(neurons))
+        z += 1
+    create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
+                 "results/acc_" + model_name + "_2.png", tikcs)
+    create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
+                 "results/los_" + model_name + "_2.png", tikcs)
+
+
+def experiment_changeable_nl(input_data, output_data, n_input, n_classes, n_nerouns, model_name, n_layers,
+                             training_epochs=15000, display_step=20000):
+    accurancy = []
+    tikcs = []
+    loss = []
+    n_hidden = []
+    z = 0
+    for neurons in n_nerouns:
+        x, y, _, _ = networks.init_multilayer_network(input_data, output_data, n_input, neurons, n_classes, n_layers,
+                                                      training_epochs=training_epochs, display_step=display_step)
+        accurancy.append(n_classes - x)
+        loss.append(y)
+        n_hidden.append(z)
+        tikcs.append(str(neurons))
+        z += 1
+    create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
+                 "results/acc_" + model_name + "_" + str(n_layers) + ".png", tikcs)
+    create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
+                 "results/los_" + model_name + "_" + str(n_layers) + ".png", tikcs)
+
+
+def experiment_changeable_rl(input_data, output_data, n_input, n_classes, n_neurons, model_name, n_layers,
+                             training_epochs=15000, display_step=20000):
+    accurancy = []
+    loss = []
+    n_hidden = []
+    for i in n_neurons:
+        x, y, _, _ = networks.init_recurrent_network(input_data, output_data, n_input, i, n_classes, n_layers,
+                                                     training_epochs=training_epochs, display_step=display_step)
+        accurancy.append(n_classes - x)
+        loss.append(y)
+        n_hidden.append(i)
+    create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
+                 "results/acc_" + model_name + "_r" + str(n_layers) + ".png", n_neurons)
+    create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
+                 "results/los" + model_name + "_r" + str(n_layers) + ".png", n_neurons)
 
 
 def experiment_x(input_data, output_data, n_input, n_layers, n_classes, training_epochs=15000, display_step=20000):
@@ -126,28 +187,6 @@ def experiment_changeable_x(input_data, output_data, n_input, n_classes, left_b,
                  "results/acc_x_1.png", range(left_b, right_b + 1, 4))
 
 
-def experiment_changeable_2l(input_data, output_data, n_input, n_classes, left_b, right_b, model_name,
-                             training_epochs=15000, display_step=20000):
-    accurancy = []
-    tikcs = []
-    loss = []
-    n_hidden = []
-    z = 0
-    for i in (8, 16, 32):
-        for j in (8, 16, 32):
-            x, y, _, _ = networks.init_multilayer_network(input_data, output_data, n_input, [i, j], n_classes, 2,
-                                                          training_epochs=training_epochs, display_step=display_step)
-            accurancy.append(n_classes - x)
-            loss.append(y)
-            n_hidden.append(z)
-            tikcs.append(str((i, j)))
-            z += 1
-    create_graph(n_hidden, accurancy, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/acc_" + model_name + "_2.png", tikcs)
-    create_graph(n_hidden, loss, ("Number of neurons on hidden layer", "Accurancy", "Model " + model_name),
-                 "results/los_" + model_name + "_2.png", tikcs)
-
-
 def create_graph(x, y, legend: list, filename: str, ticks=None):
     plt.plot(x, y)
     if ticks is not None:
@@ -167,12 +206,27 @@ if __name__ == "__main__":
     n_input = 16
     n_classes = 16
 
-    model = "f7"
+    # for i in range(0, 8):
+    #     model = "f{}".format(i)
+    #     input_data, output_data = get_test_data(model=model)
+    #
+    #     experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
+    #     experiment_changeable_1l(input_data, output_data, n_input, n_classes,  list(range(32, 65, 8)), model)
+    #     experiment_changeable_2l(input_data, output_data, n_input, n_classes,
+    #                              [[32, 32], [32, 64], [64, 64], [128, 128]], model)
+    #     experiment_changeable_rl(input_data, output_data, n_input, n_classes, list(range(32, 65, 8)), model)
+
+    model = "f6"
     input_data, output_data = get_test_data(model=model)
 
-    #experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
-    experiment_changeable_1l(input_data, output_data, n_input, n_classes, 16, 32, model, training_epochs=50000)
-    #experiment_changeable_2l(input_data, output_data, n_input, n_classes, 8, 32, model)
+    # experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
+    experiment_changeable_1l(input_data, output_data, n_input, n_classes, list(range(32, 129, 8)), model)
+    # experiment_changeable_2l(input_data, output_data, n_input, n_classes, [[64, 64], [128, 128]], model, training_epochs=100000)
+
+    #experiment_changeable_nl(input_data, output_data, n_input, n_classes, [[64, 64, 64]], model, 3,
+                             #training_epochs=500000)
+    # experiment_changeable_rl(input_data, output_data, n_input, n_classes, list(range(32, 65, 8)), model)
+    #experiment_changeable_rl(input_data, output_data, n_input, n_classes, [[64, 64]], model, 2)
 
     #
     # input_data, output_data = get_test_values(model="g1")
