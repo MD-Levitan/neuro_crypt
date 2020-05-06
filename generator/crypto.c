@@ -11,13 +11,11 @@ crypto_tfm *create_crypto_tfm(ciphersuite_t suite, crypto_params *params)
     case MAGMA:
         magma_ctx = create_magma_ctx();
         ctx->magma = magma_ctx;
-        ctx->feistel = NULL;
         break;
 
     case FEISTEL:
         feistel_ctx = create_feistel_ctx(params ? params->feistel_params.iter : 1,
                                          params ? params->feistel_params.shift : 1);
-        ctx->magma = NULL;
         ctx->feistel = feistel_ctx;
         break;
     default:

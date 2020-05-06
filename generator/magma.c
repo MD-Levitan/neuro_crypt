@@ -502,6 +502,24 @@ void magma_neuro_g3_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t
 	*y = buf ^ n2;
 }
 
+void magma_neuro_g4_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
+	uint8_t buf = (uint8_t)(n1 & 0xF);
+
+	buf += subkeys->k[0] & 0xF;
+	*y = buf & 0xF;
+}
+
+void magma_neuro_g4l_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
+	uint8_t buf = (uint8_t)(n1 & 0xFF);
+
+	buf += subkeys->k[0] & 0xFF;
+	*y = buf & 0xFF;
+}
+
 void magma_it(struct crypto_magma_ctx *magma_ctx, uint8_t *out,
 			  const uint8_t *in, uint8_t iter)
 {

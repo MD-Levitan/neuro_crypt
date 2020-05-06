@@ -13,6 +13,10 @@ models = {
            lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 4), 1),
     "g3": ("generator/bin/g3_x.bin", "generator/bin/g3_y.bin",
            lambda x: utils.split_by_bit(x, 32), lambda x: utils.split_by_bit(x, 32), 4),
+    "g4": ("generator/bin/g4_x.bin", "generator/bin/g4_y.bin",
+           lambda x: utils.split_by_bit(x, 4), lambda x: utils.split_by_bit(x, 4), 1),
+    "g4l": ("generator/bin/g4l_x.bin", "generator/bin/g4l_y.bin",
+           lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 8), 1),
     "f0": ("generator/bin/f0_x.bin", "generator/bin/f0_y.bin",
            lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
     "f1": ("generator/bin/f1_x.bin", "generator/bin/f1_y.bin",
@@ -216,12 +220,14 @@ if __name__ == "__main__":
     #                              [[32, 32], [32, 64], [64, 64], [128, 128]], model)
     #     experiment_changeable_rl(input_data, output_data, n_input, n_classes, list(range(32, 65, 8)), model)
 
-    model = "f6"
+    model = "g4l"
+    n_input = 8
+    n_classes = 8
     input_data, output_data = get_test_data(model=model)
 
-    # experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
+    experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
     experiment_changeable_1l(input_data, output_data, n_input, n_classes, list(range(32, 129, 8)), model)
-    # experiment_changeable_2l(input_data, output_data, n_input, n_classes, [[64, 64], [128, 128]], model, training_epochs=100000)
+    experiment_changeable_2l(input_data, output_data, n_input, n_classes, [[64, 64], [128, 128]], model, training_epochs=100000)
 
     #experiment_changeable_nl(input_data, output_data, n_input, n_classes, [[64, 64, 64]], model, 3,
                              #training_epochs=500000)

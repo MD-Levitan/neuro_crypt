@@ -407,7 +407,7 @@ void primitive_g0_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
 }
 
-/* Generator for G0 model */
+/* Generator for G1 model */
 void primitive_g1_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
 {
 	uint64_t out;
@@ -480,4 +480,44 @@ void feistel_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint
 
 	fwrite((uint8_t *)&in, sizeof(uint8_t), 2, out_file_x);
 	fwrite((uint8_t *)&out, sizeof(uint8_t), 2, out_file_y);
+}
+
+/* Generator for G4 model */
+void primitive_g4_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
+{
+	uint64_t out;
+	uint32_t y;
+	uint32_t n1 = GETU32_BE(((uint8_t *)&in));
+	uint32_t n2 = GETU32_BE(((uint8_t *)&in) + 4);
+
+	magma_neuro_g4_primitive(ctx->magma, n1, n2, &y);
+
+	uint8_t var = ((uint8_t *)&n1)[0];
+	var = var & 0xF;
+
+	uint8_t var2 = ((uint8_t *)&y)[0];
+	var2 = var2 & 0xF;
+
+	fwrite(&var, sizeof(uint8_t), 1, out_file_x);
+	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+}
+
+/* Generator for G4 model */
+void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
+{
+	uint64_t out;
+	uint32_t y;
+	uint32_t n1 = GETU32_BE(((uint8_t *)&in));
+	uint32_t n2 = GETU32_BE(((uint8_t *)&in) + 4);
+
+	magma_neuro_g4l_primitive(ctx->magma, n1, n2, &y);
+
+	uint8_t var = ((uint8_t *)&n1)[0];
+	var = var & 0xFF;
+
+	uint8_t var2 = ((uint8_t *)&y)[0];
+	var2 = var2 & 0xFF;
+
+	fwrite(&var, sizeof(uint8_t), 1, out_file_x);
+	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
 }

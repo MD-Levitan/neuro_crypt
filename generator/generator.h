@@ -128,6 +128,26 @@ void primitive_g2_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 void primitive_g3_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in);
 
 /**
+ * @brief Generator for G4 model. Input - 4 bits, output - 4 bits.
+ * 
+ * @param ctx           Magma context
+ * @param out_file_x    File context to write input
+ * @param out_file_y    File context to write output
+ * @param in            Input value
+ */
+void primitive_g4_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in);
+
+/**
+ * @brief Generator for G4-Long model. Input - 8 bits, output - 8 bits.
+ * 
+ * @param ctx           Magma context
+ * @param out_file_x    File context to write input
+ * @param out_file_y    File context to write output
+ * @param in            Input value
+ */
+void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in);
+
+/**
  * @brief Generator for Feistel model. Input - 16 bits, output - 16 bits.
  * 
  * @param ctx           Magma context
@@ -214,6 +234,22 @@ static model_type_t models[] = {
         .description = "Use G3 model",
         .default_input = "bin/g3_x.bin",
         .default_output = "bin/g3_y.bin",
+        .suite = MAGMA,
+    },
+    {
+        .name = "G4",
+        .gen_model_func = primitive_g4_generator,
+        .description = "Use G4 model",
+        .default_input = "bin/g4_x.bin",
+        .default_output = "bin/g4_y.bin",
+        .suite = MAGMA,
+    },
+    {
+        .name = "G4L",
+        .gen_model_func = primitive_g4l_generator,
+        .description = "Use G4-Long model",
+        .default_input = "bin/g4l_x.bin",
+        .default_output = "bin/g4l_y.bin",
         .suite = MAGMA,
     },
     {

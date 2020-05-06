@@ -124,6 +124,28 @@ extern void magma_neuro_g1(struct crypto_magma_ctx *magma_ctx, uint8_t *out,
 extern void magma_neuro_g2(struct crypto_magma_ctx *magma_ctx, uint8_t *out,
 						   const uint8_t *in, uint32_t *x, uint32_t *y);
 
+/**
+ * @brief Fucntion for creation pair for Neural Network.
+ * You can find description of this function(model) in report as model g_4.
+ * 
+ * @param magma_ctx		crypto instance
+ * @param out		result of encryption
+ * @param y			y for neural network
+ */
+extern void magma_neuro_g4(struct crypto_magma_ctx *magma_ctx, uint8_t *out,
+						   const uint8_t *in, uint32_t *x, uint32_t *y);
+
+/**
+ * @brief Fucntion for creation pair for Neural Network.
+ * You can find description of this function(model) in report as model g_4.
+ * 
+ * @param magma_ctx		crypto instance
+ * @param out		result of encryption
+ * @param y			y for neural network
+ */
+extern void magma_neuro_g4l(struct crypto_magma_ctx *magma_ctx, uint8_t *out,
+							const uint8_t *in, uint32_t *x, uint32_t *y);
+
 extern void magma_neuro_g0_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
 extern void magma_neuro_g1_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
@@ -133,6 +155,8 @@ extern void magma_neuro_g2_primitive(struct crypto_magma_ctx *magma_ctx, uint32_
 extern void magma_neuro_g3_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
 extern void magma_neuro_g4_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
+
+extern void magma_neuro_g4l_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
 #define magma_step(magma_ctx, out, in) \
 	magma_it(magma_ctx, out, in, 0)
