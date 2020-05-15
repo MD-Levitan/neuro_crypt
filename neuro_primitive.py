@@ -5,41 +5,37 @@ import networks
 import utils
 
 models = {
-    "g1": ("generator/bin/g1_x.bin", "generator/bin/g1_y.bin",
-           lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 4), 1),
-    "g2": ("generator/bin/g2_x.bin", "generator/bin/g2_y.bin",
-           lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 4), 1),
-    "g0": ("generator/bin/g0_x.bin", "generator/bin/g0_y.bin",
-           lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 4), 1),
-    "g3": ("generator/bin/g3_x.bin", "generator/bin/g3_y.bin",
-           lambda x: utils.split_by_bit(x, 32), lambda x: utils.split_by_bit(x, 32), 4),
-    "g4": ("generator/bin/g4_x.bin", "generator/bin/g4_y.bin",
-           lambda x: utils.split_by_bit(x, 4), lambda x: utils.split_by_bit(x, 4), 1),
-    "g4l": ("generator/bin/g4l_x.bin", "generator/bin/g4l_y.bin",
-           lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 8), 1),
-    "f0": ("generator/bin/f0_x.bin", "generator/bin/f0_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f1": ("generator/bin/f1_x.bin", "generator/bin/f1_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f2": ("generator/bin/f2_x.bin", "generator/bin/f2_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f3": ("generator/bin/f3_x.bin", "generator/bin/f3_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f4": ("generator/bin/f4_x.bin", "generator/bin/f4_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f5": ("generator/bin/f5_x.bin", "generator/bin/f5_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f6": ("generator/bin/f6_x.bin", "generator/bin/f6_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f7": ("generator/bin/f7_x.bin", "generator/bin/f7_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
-    "f0-2": ("generator/bin/f0-2_x.bin", "generator/bin/f0-2_y.bin",
-           lambda x: utils.split_by_bit(x, 16), lambda x: utils.split_by_bit(x, 16), 2),
+    # "g3": ("generator/bin/g3_x.bin", "generator/bin/g3_y.bin",
+    #        lambda x: utils.split_by_bit(x, 32), lambda x: utils.split_by_bit(x, 32), 4),
+    # "g4": ("generator/bin/g4_x.bin", "generator/bin/g4_y.bin",
+    #        lambda x: utils.split_by_bit(x, 4), lambda x: utils.split_by_bit(x, 4), 1),
+    # "g4l": ("generator/bin/g4l_x.bin", "generator/bin/g4l_y.bin",
+    #        lambda x: utils.split_by_bit(x, 8), lambda x: utils.split_by_bit(x, 8), 1),
 }
 
 
-def get_test_data(model: str):
-    return utils.get_primitive(models[model])
+def add_feistel_model(storage: dict, max_iteration=16):
+    for iteration in range(1, max_iteration + 1):
+        for shift in range(0, 8):
+            model_name = "f{}-{}".format(iteration, shift)
+            storage[model_name] = ("generator/bin/{}_x.bin".format(model_name),
+                                   "generator/bin/{}_y.bin".format(model_name),
+                                   lambda x: utils.split_by_bit(x, 8),
+                                   lambda x: utils.split_by_bit(x, 4), 1)
+
+
+def add_primitive_model(storage: dict):
+    for id in range(0, 3):
+        model_name = "g{}".format(id)
+        storage[model_name] = ("generator/bin/{}_x.bin".format(model_name),
+                               "generator/bin/{}_y.bin".format(model_name),
+                               lambda x: utils.split_by_bit(x, 16),
+                               lambda x: utils.split_by_bit(x, 16),
+                               2)
+
+
+def get_test_data(model_name: str, storage):
+    return utils.get_primitive(storage[model_name])
 
 
 def experiment_std(input_data, output_data, n_input, n_classes, training_epochs=15000, display_step=1000):
@@ -206,28 +202,33 @@ def create_graph(x, y, legend: list, filename: str, ticks=None):
 
 
 if __name__ == "__main__":
+    add_feistel_model(models, max_iteration=4)
     # Network Parameters
     n_input = 16
     n_classes = 16
 
-    # for i in range(0, 8):
-    #     model = "f{}".format(i)
-    #     input_data, output_data = get_test_data(model=model)
+    for model_name in models.keys():
+        print(model_name)
+        input_data, output_data = get_test_data(model_name=model_name, storage=models)
+
+        experiment_changeable_0l(input_data, output_data, n_input, n_classes, model_name)
+        experiment_changeable_1l(input_data, output_data, n_input, n_classes, [32, 64], model_name)
+        experiment_changeable_2l(input_data, output_data, n_input, n_classes, [[32, 32], [64, 64]], model_name)
+        # experiment_changeable_rl(input_data, output_data, n_input, n_classes, [32, 64], model_name)
+        # experiment_changeable_1l(input_data, output_data, n_input, n_classes,  list(range(32, 65, 8)), model)
+        # experiment_changeable_2l(input_data, output_data, n_input, n_classes,
+                                 #[[32, 32], [32, 64], [64, 64], [128, 128]], model)
+        #experiment_changeable_rl(input_data, output_data, n_input, n_classes, list(range(32, 65, 8)), model)
+        print()
+
+    # model = "g4l"
+    # n_input = 8
+    # n_classes = 8
+    # input_data, output_data = get_test_data(model=model)
     #
-    #     experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
-    #     experiment_changeable_1l(input_data, output_data, n_input, n_classes,  list(range(32, 65, 8)), model)
-    #     experiment_changeable_2l(input_data, output_data, n_input, n_classes,
-    #                              [[32, 32], [32, 64], [64, 64], [128, 128]], model)
-    #     experiment_changeable_rl(input_data, output_data, n_input, n_classes, list(range(32, 65, 8)), model)
-
-    model = "g4l"
-    n_input = 8
-    n_classes = 8
-    input_data, output_data = get_test_data(model=model)
-
-    experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
-    experiment_changeable_1l(input_data, output_data, n_input, n_classes, list(range(32, 129, 8)), model)
-    experiment_changeable_2l(input_data, output_data, n_input, n_classes, [[64, 64], [128, 128]], model, training_epochs=100000)
+    # experiment_changeable_0l(input_data, output_data, n_input, n_classes, model)
+    # experiment_changeable_1l(input_data, output_data, n_input, n_classes, list(range(32, 129, 8)), model)
+    # experiment_changeable_2l(input_data, output_data, n_input, n_classes, [[64, 64], [128, 128]], model, training_epochs=100000)
 
     #experiment_changeable_nl(input_data, output_data, n_input, n_classes, [[64, 64, 64]], model, 3,
                              #training_epochs=500000)
