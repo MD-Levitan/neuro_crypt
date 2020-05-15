@@ -161,6 +161,16 @@ void generate_random_key(uint8_t *key);
 
 typedef struct generator_type_t generator_type_t;
 typedef struct model_type_t model_type_t;
+typedef model_type_t * (*formatter)(const char *);
+
+/**
+ * @brief Formatter for Feistel models
+ * 
+ * @param str               input string
+ *  
+ * @return model_type_t     NULL if str is incorrect 
+ */
+model_type_t *feistel_formatter(const char *str);
 
 struct generator_type_t
 {
@@ -171,11 +181,12 @@ struct generator_type_t
 
 struct model_type_t
 {
-    const char *name;
+    char *name;
+    formatter formatter;
     generator_model gen_model_func;
-    const char *description;
-    const char *default_input;
-    const char *default_output;
+    char *description;
+    char *default_input;
+    char *default_output;
     ciphersuite_t suite;
     crypto_params params;
 };
@@ -190,6 +201,7 @@ static generator_type_t generators[] = {
 static model_type_t models[] = {
     {
         .name = "GOST-1",
+        .formatter = NULL,
         .gen_model_func = round_generator,
         .description = "Use 1-round GOST encryption",
         .default_input = "bin/n1_x.bin",
@@ -198,6 +210,7 @@ static model_type_t models[] = {
     },
     {
         .name = "GOST-2",
+        .formatter = NULL,
         .gen_model_func = n_round_generator,
         .description = "Use 2-round GOST encryption",
         .default_input = "bin/n2_x.bin",
@@ -206,6 +219,7 @@ static model_type_t models[] = {
     },
     {
         .name = "G0",
+        .formatter = NULL,
         .gen_model_func = primitive_g0_generator,
         .description = "Use G0 model",
         .default_input = "bin/g0_x.bin",
@@ -214,6 +228,7 @@ static model_type_t models[] = {
     },
     {
         .name = "G1",
+        .formatter = NULL,
         .gen_model_func = primitive_g1_generator,
         .description = "Use G1 model",
         .default_input = "bin/g1_x.bin",
@@ -222,6 +237,7 @@ static model_type_t models[] = {
     },
     {
         .name = "G2",
+        .formatter = NULL,
         .gen_model_func = primitive_g2_generator,
         .description = "Use G2 model",
         .default_input = "bin/g2_x.bin",
@@ -230,6 +246,7 @@ static model_type_t models[] = {
     },
     {
         .name = "G3",
+        .formatter = NULL,
         .gen_model_func = primitive_g3_generator,
         .description = "Use G3 model",
         .default_input = "bin/g3_x.bin",
@@ -238,6 +255,7 @@ static model_type_t models[] = {
     },
     {
         .name = "G4",
+        .formatter = NULL,
         .gen_model_func = primitive_g4_generator,
         .description = "Use G4 model",
         .default_input = "bin/g4_x.bin",
@@ -246,6 +264,7 @@ static model_type_t models[] = {
     },
     {
         .name = "G4L",
+        .formatter = NULL,
         .gen_model_func = primitive_g4l_generator,
         .description = "Use G4-Long model",
         .default_input = "bin/g4l_x.bin",
@@ -253,151 +272,18 @@ static model_type_t models[] = {
         .suite = MAGMA,
     },
     {
-        .name = "F0",
+        .name = "F<I>-<S>",
+        .formatter = feistel_formatter,
         .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 0 shift",
-        .default_input = "bin/f0_x.bin",
-        .default_output = "bin/f0_y.bin",
+        .description = "Use feistel model with <S> shift and <I> iteration",
+        .default_input = "bin/f<I>-<S>_x.bin",
+        .default_output = "bin/f<I>-<S>_y.bin",
         .suite = FEISTEL,
         .params.feistel_params = {.iter = 1, .shift = 1},
-    },
-    {
-        .name = "F1",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 1 shift",
-        .default_input = "bin/f1_x.bin",
-        .default_output = "bin/f1_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 1},
-    },
-    {
-        .name = "F2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 2 shift",
-        .default_input = "bin/f2_x.bin",
-        .default_output = "bin/f2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 2},
-    },
-    {
-        .name = "F3",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 3 shift",
-        .default_input = "bin/f3_x.bin",
-        .default_output = "bin/f3_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 3},
-    },
-    {
-        .name = "F4",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 0 shift",
-        .default_input = "bin/f4_x.bin",
-        .default_output = "bin/f4_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 4},
-    },
-    {
-        .name = "F5",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 5 shift",
-        .default_input = "bin/f5_x.bin",
-        .default_output = "bin/f5_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 5},
-    },
-    {
-        .name = "F6",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 6 shift",
-        .default_input = "bin/f6_x.bin",
-        .default_output = "bin/f6_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 6},
-    },
-    {
-        .name = "F7",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 7 shift",
-        .default_input = "bin/f7_x.bin",
-        .default_output = "bin/f7_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 1, .shift = 7},
-    },
-    {
-        .name = "F0-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 0 shift",
-        .default_input = "bin/f0-2_x.bin",
-        .default_output = "bin/f0-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 1},
-    },
-    {
-        .name = "F1-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 1 shift",
-        .default_input = "bin/f1-2_x.bin",
-        .default_output = "bin/f1-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 1},
-    },
-    {
-        .name = "F2-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 2 shift",
-        .default_input = "bin/f2-2_x.bin",
-        .default_output = "bin/f2-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 2},
-    },
-    {
-        .name = "F3-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 3 shift",
-        .default_input = "bin/f3-2_x.bin",
-        .default_output = "bin/f3-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 3},
-    },
-    {
-        .name = "F4-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 0 shift",
-        .default_input = "bin/f4-2_x.bin",
-        .default_output = "bin/f4-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 4},
-    },
-    {
-        .name = "F5-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 5 shift",
-        .default_input = "bin/f5-2_x.bin",
-        .default_output = "bin/f5-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 5},
-    },
-    {
-        .name = "F6-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 6 shift",
-        .default_input = "bin/f6-2_x.bin",
-        .default_output = "bin/f6-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 6},
-    },
-    {
-        .name = "F7-2",
-        .gen_model_func = feistel_generator,
-        .description = "Use feistel model with 7 shift",
-        .default_input = "bin/f7-2_x.bin",
-        .default_output = "bin/f7-2_y.bin",
-        .suite = FEISTEL,
-        .params.feistel_params = {.iter = 2, .shift = 7},
     },
 };
 
+void destroy_model(model_type_t *model);
 void print_models();
 void print_generators();
 

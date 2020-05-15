@@ -57,12 +57,21 @@ model_type_t *get_model_by_name(const char *name)
 {
 	size_t size = sizeof(models) / sizeof(models[0]);
 	model_type_t *list = models;
+	model_type_t *model;
 
 	for (uint8_t i = 0; i < size; ++i)
 	{
 		if (strcmp(list[i].name, name) == 0)
 		{
 			return &list[i];
+		}
+		if (list[i].formatter)
+		{
+			model = list[i].formatter(name);
+			if (model)
+			{
+				return model;
+			}
 		}
 	}
 	return NULL;
@@ -520,4 +529,50 @@ void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y
 
 	fwrite(&var, sizeof(uint8_t), 1, out_file_x);
 	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+}
+
+
+
+model_type_t *feistel_formatter(const char *str)
+{
+	const char *feistel_format 	= "F%d-%d",
+			   *feistel_input 	= "bin/f%d-%d_x.bin",
+			   *feistel_output 	= "bin/f%d-%d_y.bin";
+
+	uint8_t shift, iter;
+	model_type_t *this = NULL;
+	size_t buf_size = 21;
+
+	if (sscanf(str, feistel_format, &iter, &shift) == 2 &&
+		(shift <= 7) && (iter <= 16) && (iter > 0))
+	{
+		this = (model_type_t *)malloc(sizeof(model_type_t));
+		this->name = malloc(buf_size);
+		this->default_input = malloc(buf_size);
+		this->default_output = malloc(buf_size);
+		/* Shows that this model need free */
+		this->formatter = feistel_formatter;
+		snprintf(this->name, 20, feistel_format, iter, shift);
+		snprintf(this->default_input, 20, feistel_input, iter, shift);
+		snprintf(this->default_output, 20, feistel_output, iter, shift);
+
+		this->params.feistel_params.iter = iter;
+		this->params.feistel_params.shift = shift;
+
+		this->gen_model_func = feistel_generator;
+		this->suite = FEISTEL;
+		return this;
+	}
+	return this;
+}
+
+void destroy_model(model_type_t *model)
+{
+	if (model->formatter != NULL)
+	{
+		free(model->name);
+		free(model->default_input);
+		free(model->default_output);
+		free(model);
+	}
 }

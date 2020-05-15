@@ -61,4 +61,5 @@ int main(int argc, const char **argv)
     generator->gen_func(ctx, size, (const char *)input_file, (const char *)output_file, model->gen_model_func);
 
     delete_crypto_tfm(model->suite, ctx);
+    destroy_model(model);
 }
