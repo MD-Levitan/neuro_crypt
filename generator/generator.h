@@ -9,7 +9,8 @@
 
 #include "crypto.h"
 
-typedef void (*generator)(crypto_tfm *ctx, uint64_t size,
+typedef struct generator_params_t generator_params_t;
+typedef void (*generator)(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
                           const char *filename_x, const char *filename_y,
                           void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in));
 
@@ -18,59 +19,78 @@ typedef void (*generator_model)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_fil
 /**
  * @brief Iterate from 0 to @size as input to @gen function
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
+ * @param params        Params for generator, can be NULL
  * @param size          size of output sequence <= UINT64_MAX
  * @param filename_x    filename with input
  * @param filename_y    filename with output
  * @param gen           generator of output sequence
  */
-void iterate_generator(crypto_tfm *ctx, uint64_t size,
-                       const char *filename_x, const char *filename_y,
+void iterate_generator(crypto_tfm *ctx, generator_params_t *params,
+                       uint64_t size, const char *filename_x, const char *filename_y,
                        generator_model gen);
 
 /**
  * @brief Iterate from 0 to @size in two 32-bite blocks as input to @gen function
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
+ * @param params        Params for generator, can be NULL
  * @param size          size of output sequence <= UINT32_MAX
  * @param filename_x    filename with input
  * @param filename_y    filename with output
  * @param gen           generator of output sequence
  */
-void iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
-                                const char *filename_x, const char *filename_y,
+void iterate_parallel_generator(crypto_tfm *ctx, generator_params_t *params,
+                                uint64_t size, const char *filename_x, const char *filename_y,
                                 generator_model gen);
+
+/**
+ * @brief Iterate from 0 to @size in two <S>-bite blocks as input to @gen function.
+ *        <S> from params. Support <S> = {4, 8, 16, 32}. Size of output is @size^2.
+ * 
+ * @param ctx           Crypto context
+ * @param params        Params for generator, can be NULL
+ * @param size          size of output sequence <= UINT32_MAX
+ * @param filename_x    filename with input
+ * @param filename_y    filename with output
+ * @param gen           generator of output sequence
+ */
+void iterate_split_generator(crypto_tfm *ctx, generator_params_t *params,
+                             uint64_t size, const char *filename_x, const char *filename_y,
+                             generator_model gen);
 
 /**
  * @brief Generate random @size values as input to @gen function
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
+ * @param params        Params for generator, can be NULL
  * @param size          size of output sequence <= UINT64_MAX
  * @param filename_x    filename with input
  * @param filename_y    filename with output
  * @param gen           generator of output sequence
  */
-void random_generator(crypto_tfm *ctx, uint64_t size,
-                      const char *filename_x, const char *filename_y,
+void random_generator(crypto_tfm *ctx, generator_params_t *params,
+                      uint64_t size, const char *filename_x, const char *filename_y,
                       generator_model gen);
 
 /**
  * @brief Iterate values from 0 to @size in random order as input to @gen function
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
+ * @param params        Params for generator, can be NULL
  * @param size          size of output sequence <= UINT64_MAX
  * @param filename_x    filename with input
  * @param filename_y    filename with output
  * @param gen           generator of output sequence
  */
-void random_iterate_generator(crypto_tfm *ctx, uint64_t size,
-                              const char *filename_x, const char *filename_y,
+void random_iterate_generator(crypto_tfm *ctx, generator_params_t *params,
+                              uint64_t size, const char *filename_x, const char *filename_y,
                               generator_model gen);
 
 /**
  * @brief Generator for 1-round of GOST
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -80,7 +100,7 @@ void round_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64
 /**
  * @brief Generator for 2-round of GOST
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -90,7 +110,7 @@ void n_round_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint
 /**
  * @brief Generator for G0 model. Input - 8 bits, output - 4 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -100,7 +120,7 @@ void primitive_g0_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 /**
  * @brief Generator for G1 model. Input - 8 bits, output - 4 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -110,7 +130,7 @@ void primitive_g1_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 /**
  * @brief Generator for G2 model. Input - 8 bits, output - 4 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -120,7 +140,7 @@ void primitive_g2_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 /**
  * @brief Generator for G3 model. Input - 64 bits, output - 32 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -130,7 +150,7 @@ void primitive_g3_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 /**
  * @brief Generator for G4 model. Input - 4 bits, output - 4 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -140,7 +160,7 @@ void primitive_g4_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 /**
  * @brief Generator for G4-Long model. Input - 8 bits, output - 8 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -150,7 +170,7 @@ void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y
 /**
  * @brief Generator for Feistel model. Input - 16 bits, output - 16 bits.
  * 
- * @param ctx           Magma context
+ * @param ctx           Crypto context
  * @param out_file_x    File context to write input
  * @param out_file_y    File context to write output
  * @param in            Input value
@@ -161,7 +181,62 @@ void generate_random_key(uint8_t *key);
 
 typedef struct generator_type_t generator_type_t;
 typedef struct model_type_t model_type_t;
-typedef model_type_t * (*formatter)(const char *);
+
+typedef model_type_t *(*model_formatter)(const char *);
+typedef generator_type_t *(*generator_formatter)(const char *);
+
+/**
+ * Struct with input and output params of generator
+ */
+struct generator_params_t
+{
+    /* Split input  */
+    uint8_t split;
+    /* Size left input, if split == 0, then left is main */
+    uint8_t left_input;
+    /* Size right input, if split == 0, then right is 0 */
+    uint8_t right_input;
+};
+
+/**
+ * Struct with generator's description 
+ */
+struct generator_type_t
+{
+    /* Generator name */
+    char *name;
+    /* Description of generator */
+    char *description;
+    /* Pointer to generator */
+    generator gen_func;
+    /* Params for generator */
+    generator_params_t params;
+    /* Generator formatter for specific generator that needs param */
+    generator_formatter formatter;
+};
+
+/**
+ * Struct with model's description
+ */
+struct model_type_t
+{
+    /* Model name */
+    char *name;
+    /* Model description */
+    char *description;
+    /* Default filepath for output */
+    char *default_input;
+    /* Default filepath for input */
+    char *default_output;
+    /* Pointer to model generator */
+    generator_model gen_model_func;
+    /* Model ciphersuite */
+    ciphersuite_t suite;
+    /* Params for model */
+    crypto_params params;
+    /* Model formatter for model that needs params */
+    model_formatter formatter;
+};
 
 /**
  * @brief Formatter for Feistel models
@@ -172,30 +247,42 @@ typedef model_type_t * (*formatter)(const char *);
  */
 model_type_t *feistel_formatter(const char *str);
 
-struct generator_type_t
-{
-    const char *name;
-    generator gen_func;
-    const char *description;
-};
-
-struct model_type_t
-{
-    char *name;
-    formatter formatter;
-    generator_model gen_model_func;
-    char *description;
-    char *default_input;
-    char *default_output;
-    ciphersuite_t suite;
-    crypto_params params;
-};
+/**
+ * @brief Formatter for iter-split generator
+ * 
+ * @param str                   input string
+ *  
+ * @return generator_type_t     NULL if str is incorrect 
+ */
+generator_type_t *iter_split_formatter(const char *str);
 
 static generator_type_t generators[] = {
-    {.name = "iter", .gen_func = iterate_generator, .description = "Iterate from 0 to size"},
-    {.name = "iter2", .gen_func = iterate_parallel_generator, .description = "Iterate from 0 to size in 2 32-bite blocks"},
-    {.name = "rand", .gen_func = random_generator, .description = "Generate random value as input"},
-    {.name = "rand2", .gen_func = random_iterate_generator, .description = "Iterate from 0 to size in random order"},
+    {
+        .name = "iter",
+        .gen_func = iterate_generator,
+        .description = "Iterate from 0 to size",
+    },
+    {
+        .name = "iter2",
+        .gen_func = iterate_parallel_generator,
+        .description = "Iterate from 0 to size in 2 32-bite blocks",
+    },
+    {
+        .name = "rand",
+        .gen_func = random_generator,
+        .description = "Generate random value as input",
+    },
+    {
+        .name = "rand2",
+        .gen_func = random_iterate_generator,
+        .description = "Iterate from 0 to size in random order",
+    },
+    {
+        .name = "iter-split-<S>",
+        .gen_func = iterate_split_generator,
+        .description = "Iterate from 0 to size. Input=Left|Right. <S> - size of one part in bits",
+        .formatter = iter_split_formatter,
+    },
 };
 
 static model_type_t models[] = {
@@ -283,7 +370,6 @@ static model_type_t models[] = {
     },
 };
 
-void destroy_model(model_type_t *model);
 void print_models();
 void print_generators();
 
@@ -291,5 +377,8 @@ generator_type_t *get_type_by_name(const char *name, generator_type_t *list, uin
 
 generator_type_t *get_generator_by_name(const char *name);
 model_type_t *get_model_by_name(const char *name);
+
+void destroy_model(model_type_t *model);
+void destroy_generator(generator_type_t *generator);
 
 #endif //GENERATOR_H_

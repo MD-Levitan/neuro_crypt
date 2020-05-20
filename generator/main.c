@@ -58,8 +58,10 @@ int main(int argc, const char **argv)
 
     printf("Generate sequence with following params:\n\tgenerator - %s\n\tmodel - %s\n\tsize - %lld\n\tinput - %s\n\toutput - %s\n",
            generator->name, model->name, size, input_file, output_file);
-    generator->gen_func(ctx, size, (const char *)input_file, (const char *)output_file, model->gen_model_func);
+    
+    generator->gen_func(ctx, &generator->params, size, (const char *)input_file, (const char *)output_file, model->gen_model_func);
 
     delete_crypto_tfm(model->suite, ctx);
     destroy_model(model);
+    destroy_generator(generator);
 }

@@ -7,78 +7,16 @@
 
 #define gen_n(n)
 
-void generate_random_key(uint8_t *key)
-{
-	srand(time(NULL));
-	for (uint8_t i = 0; i < 32; ++i)
-	{
-		key[i] = 0x86; //rand();
-	}
-}
+/**** 
+ * 
+ * 
+ * GENERATORS 
+ * 
+ * 
+ ****/
 
-void print_models()
-{
-	printf("Models:\n\n");
-	for (uint8_t i = 0; i < sizeof(models) / sizeof(models[0]); ++i)
-	{
-		printf("\t%s\t-\t%s (default files: %s, %s)\n",
-			   models[i].name, models[i].description,
-			   models[i].default_input, models[i].default_output);
-	}
-	printf("\n");
-}
-
-void print_generators()
-{
-	printf("Generators:\n\n");
-	for (uint8_t i = 0; i < sizeof(generators) / sizeof(generators[0]); ++i)
-	{
-		printf("\t%s\t-\t%s\n", generators[i].name, generators[i].description);
-	}
-	printf("\n");
-}
-
-generator_type_t *get_generator_by_name(const char *name)
-{
-	size_t size = sizeof(generators) / sizeof(generators[0]);
-	generator_type_t *list = generators;
-
-	for (uint8_t i = 0; i < size; ++i)
-	{
-		if (strcmp(list[i].name, name) == 0)
-		{
-			return &list[i];
-		}
-	}
-	return NULL;
-}
-
-model_type_t *get_model_by_name(const char *name)
-{
-	size_t size = sizeof(models) / sizeof(models[0]);
-	model_type_t *list = models;
-	model_type_t *model;
-
-	for (uint8_t i = 0; i < size; ++i)
-	{
-		if (strcmp(list[i].name, name) == 0)
-		{
-			return &list[i];
-		}
-		if (list[i].formatter)
-		{
-			model = list[i].formatter(name);
-			if (model)
-			{
-				return model;
-			}
-		}
-	}
-	return NULL;
-}
-
-/* Consecutive generator */
-void iterate_generator(crypto_tfm *ctx, uint64_t size,
+/* Iterate generator */
+void iterate_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
 					   const char *filename_x, const char *filename_y,
 					   void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
@@ -104,7 +42,7 @@ void iterate_generator(crypto_tfm *ctx, uint64_t size,
 }
 
 /* Consecutive generator */
-void iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
+void iterate_parallel_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
 								const char *filename_x, const char *filename_y,
 								void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
@@ -140,7 +78,7 @@ void iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
 }
 
 /* Random generator */
-void random_generator(crypto_tfm *ctx, uint64_t size,
+void random_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
 					  const char *filename_x, const char *filename_y,
 					  void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
@@ -171,7 +109,7 @@ void random_generator(crypto_tfm *ctx, uint64_t size,
 }
 
 /* Consecutive generator with random order */
-void random_iterate_generator(crypto_tfm *ctx, uint64_t size,
+void random_iterate_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
 							  const char *filename_x, const char *filename_y,
 							  void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
 {
@@ -220,60 +158,134 @@ void random_iterate_generator(crypto_tfm *ctx, uint64_t size,
 	fclose(out_file_y);
 }
 
-// /* Consecutive generator with random order*/
-// void random_iterate_parallel_generator(crypto_tfm *ctx, uint64_t size,
-// 					  		  		   const char *filename_x, const char *filename_y,
-// 					  		           void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
-// {
-// 	FILE *out_file_x, *out_file_y;
-// 	uint64_t in, value, size_x, *memory1, *memory2;
+/* Iterate in 2 blocks generator */
+void iterate_split_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
+							 const char *filename_x, const char *filename_y,
+							 void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
+{
 
-// 	out_file_x = fopen(filename_x, "wb");
-// 	out_file_y = fopen(filename_y, "wb");
+	FILE *out_file_x, *out_file_y;
+	uint64_t in;
+	uint32_t n1, n2;
 
-// 	if (out_file_x == NULL || out_file_y == NULL)
-// 	{
-// 		printf("error: cannot open file!\n");
-// 		exit(1);
-// 	}
+	if (params == NULL)
+	{
+		fprintf(stderr, "error: params for generator is empty (NULL)");
+		return;
+	}
 
-// 	srand(time(NULL));
-// 	memory2 = malloc(sizeof(uint64_t) * size);
-// 	memory1 = malloc(sizeof(uint64_t) * size);
-// 	if (memory1 == NULL || memory2 == NULL)
-// 	{
-// 		printf("error: cannot malloc!\n");
-// 		exit(1);
-// 	}
+	out_file_x = fopen(filename_x, "wb");
+	out_file_y = fopen(filename_y, "wb");
 
-// 	for (uint64_t i = 0; i < size; i++)
-// 	{
-// 		memory1[i] = i;
-// 	}
+	if (out_file_x == NULL || out_file_y == NULL)
+	{
+		printf("error: cannot open file!\n");
+		exit(1);
+	}
 
-// 	for (uint64_t i = 0; i < size; i++)
-// 	{
-// 		memory2[i] = i;
-// 	}
+	for (n1 = 0; n1 < size; ++n1)
+	{
+		for (n2 = 0; n2 < size; ++n2)
+		{
+			in = 0;
+			switch (params->left_input)
+			{
+				case 4:
+				{
+					uint8_t *var = ((uint8_t *)&in);
+					*var = n1 & 0xF;
+					*var += n2 & 0xF0;
+					break;
+				}
+				case 8:
+				{
+					((uint8_t *)&in)[0] = n1;
+					((uint8_t *)&in)[1] = n2;
+					break;
+				}
+				case 16:
+				{
+					((uint16_t *)&in)[0] = n1;
+					((uint16_t *)&in)[1] = n2;
+					break;
+				}
+				case 32:
+				{
+					((uint32_t *)&in)[0] = n1;
+					((uint32_t *)&in)[1] = n2;
+					break;
+				}
+			}
+			generator(ctx, out_file_x, out_file_y, in);
+		}
+	}
 
-// 	size_x = size;
-// 	for (uint64_t i = 0; i < size - 1; ++i)
-// 	{
-// 		in = 0;
-// 		value = 0;
-// 		((uint32_t *) &in)[0] = rand();
-// 		((uint32_t *) &in)[1] = rand();
-// 		value = memory1[in % size_x];
-// 		//printf("%ld\n", value);
-// 		memory1[in % size_x] = memory1[size_x - 1];
-// 		size_x--;
+	fclose(out_file_x);
+	fclose(out_file_y);
+}
 
-// 		generator(ctx, out_file_x, out_file_y, value);
-// 	}
+/* Consecutive generator with random order*/
+void random_iterate_parallel_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
+									   const char *filename_x, const char *filename_y,
+									   void (*generator)(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in))
+{
+	FILE *out_file_x, *out_file_y;
+	uint64_t in, value, size_x, *memory1, *memory2;
 
-// 	fclose(out_file_x);
-// 	fclose(out_file_y);
-// }
+	out_file_x = fopen(filename_x, "wb");
+	out_file_y = fopen(filename_y, "wb");
+
+	if (out_file_x == NULL || out_file_y == NULL)
+	{
+		printf("error: cannot open file!\n");
+		exit(1);
+	}
+
+	srand(time(NULL));
+	memory2 = malloc(sizeof(uint64_t) * size);
+	memory1 = malloc(sizeof(uint64_t) * size);
+	if (memory1 == NULL || memory2 == NULL)
+	{
+		printf("error: cannot malloc!\n");
+		exit(1);
+	}
+
+	for (uint64_t i = 0; i < size; i++)
+	{
+		memory1[i] = i;
+	}
+
+	for (uint64_t i = 0; i < size; i++)
+	{
+		memory2[i] = i;
+	}
+
+	size_x = size;
+	for (uint64_t i = 0; i < size - 1; ++i)
+	{
+		in = 0;
+		value = 0;
+		((uint32_t *)&in)[0] = rand();
+		((uint32_t *)&in)[1] = rand();
+		value = memory1[in % size_x];
+		//printf("%ld\n", value);
+		memory1[in % size_x] = memory1[size_x - 1];
+		size_x--;
+
+		generator(ctx, out_file_x, out_file_y, value);
+	}
+
+	fclose(out_file_x);
+	fclose(out_file_y);
+}
+
+/**** 
+ * 
+ * 
+ * MODELS 
+ * 
+ * 
+ ****/
 
 /* Generator for G3 model/1-round of GOST */
 void round_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
@@ -531,13 +543,11 @@ void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y
 	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
 }
 
-
-
 model_type_t *feistel_formatter(const char *str)
 {
-	const char *feistel_format 	= "F%d-%d",
-			   *feistel_input 	= "bin/f%d-%d_x.bin",
-			   *feistel_output 	= "bin/f%d-%d_y.bin";
+	const char *feistel_format = "F%d-%d",
+			   *feistel_input = "bin/f%d-%d_x.bin",
+			   *feistel_output = "bin/f%d-%d_y.bin";
 
 	uint8_t shift, iter;
 	model_type_t *this = NULL;
@@ -566,6 +576,33 @@ model_type_t *feistel_formatter(const char *str)
 	return this;
 }
 
+generator_type_t *iter_split_formatter(const char *str)
+{
+	const char *format = "iter-split-%d";
+
+	uint8_t size;
+	generator_type_t *this = NULL;
+	size_t buf_size = 21;
+
+	if (sscanf(str, format, &size) == 1)
+	{
+		this = (generator_type_t *)malloc(sizeof(generator_type_t));
+		this->name = malloc(buf_size);
+
+		/* Shows that this model need free */
+		this->formatter = iter_split_formatter;
+		snprintf(this->name, 20, format, size);
+
+		this->params.split = 1;
+		this->params.left_input = size;
+		this->params.right_input = size;
+
+		this->gen_func = iterate_split_generator;
+		return this;
+	}
+	return this;
+};
+
 void destroy_model(model_type_t *model)
 {
 	if (model->formatter != NULL)
@@ -575,4 +612,93 @@ void destroy_model(model_type_t *model)
 		free(model->default_output);
 		free(model);
 	}
+}
+
+void destroy_generator(generator_type_t *generator)
+{
+	if (generator->formatter != NULL)
+	{
+		free(generator->name);
+		free(generator);
+	}
+}
+
+void generate_random_key(uint8_t *key)
+{
+	srand(time(NULL));
+	for (uint8_t i = 0; i < 32; ++i)
+	{
+		key[i] = 0x86; //rand();
+	}
+}
+
+void print_models()
+{
+	printf("Models:\n\n");
+	for (uint8_t i = 0; i < sizeof(models) / sizeof(models[0]); ++i)
+	{
+		printf("\t%s\t-\t%s (default files: %s, %s)\n",
+			   models[i].name, models[i].description,
+			   models[i].default_input, models[i].default_output);
+	}
+	printf("\n");
+}
+
+void print_generators()
+{
+	printf("Generators:\n\n");
+	for (uint8_t i = 0; i < sizeof(generators) / sizeof(generators[0]); ++i)
+	{
+		printf("\t%s\t-\t%s\n", generators[i].name, generators[i].description);
+	}
+	printf("\n");
+}
+
+generator_type_t *get_generator_by_name(const char *name)
+{
+	size_t size = sizeof(generators) / sizeof(generators[0]);
+	generator_type_t *list = generators;
+	generator_type_t *generator;
+
+	for (uint8_t i = 0; i < size; ++i)
+	{
+		if (strcmp(list[i].name, name) == 0)
+		{
+			return &list[i];
+		}
+		if (list[i].formatter)
+		{
+			printf("Check formatter\n");
+			generator = list[i].formatter(name);
+			if (generator)
+			{
+				return generator;
+			}
+		}
+	}
+	return NULL;
+}
+
+model_type_t *get_model_by_name(const char *name)
+{
+	size_t size = sizeof(models) / sizeof(models[0]);
+	model_type_t *list = models;
+	model_type_t *model;
+
+	for (uint8_t i = 0; i < size; ++i)
+	{
+		if (strcmp(list[i].name, name) == 0)
+		{
+			return &list[i];
+		}
+		if (list[i].formatter)
+		{
+			model = list[i].formatter(name);
+			if (model)
+			{
+				return model;
+			}
+		}
+	}
+	return NULL;
 }
