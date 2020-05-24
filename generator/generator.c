@@ -190,31 +190,31 @@ void iterate_split_generator(crypto_tfm *ctx, generator_params_t *params, uint64
 			in = 0;
 			switch (params->left_input)
 			{
-				case 4:
-				{
-					uint8_t *var = ((uint8_t *)&in);
-					*var = n1 & 0xF;
-					*var += n2 & 0xF0;
-					break;
-				}
-				case 8:
-				{
-					((uint8_t *)&in)[0] = n1;
-					((uint8_t *)&in)[1] = n2;
-					break;
-				}
-				case 16:
-				{
-					((uint16_t *)&in)[0] = n1;
-					((uint16_t *)&in)[1] = n2;
-					break;
-				}
-				case 32:
-				{
-					((uint32_t *)&in)[0] = n1;
-					((uint32_t *)&in)[1] = n2;
-					break;
-				}
+			case 4:
+			{
+				uint8_t *var = ((uint8_t *)&in);
+				*var = n1 & 0xF;
+				*var += n2 & 0xF0;
+				break;
+			}
+			case 8:
+			{
+				((uint8_t *)&in)[0] = n1;
+				((uint8_t *)&in)[1] = n2;
+				break;
+			}
+			case 16:
+			{
+				((uint16_t *)&in)[0] = n1;
+				((uint16_t *)&in)[1] = n2;
+				break;
+			}
+			case 32:
+			{
+				((uint32_t *)&in)[0] = n1;
+				((uint32_t *)&in)[1] = n2;
+				break;
+			}
 			}
 			generator(ctx, out_file_x, out_file_y, in);
 		}
@@ -506,41 +506,47 @@ void feistel_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint
 /* Generator for G4 model */
 void primitive_g4_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
 {
-	uint64_t out;
 	uint32_t y;
 	uint32_t n1 = GETU32_BE(((uint8_t *)&in));
 	uint32_t n2 = GETU32_BE(((uint8_t *)&in) + 4);
 
-	magma_neuro_g4_primitive(ctx->magma, n1, n2, &y);
+	uint8_t var1, var2;
 
-	uint8_t var = ((uint8_t *)&n1)[0];
-	var = var & 0xF;
+	switch (ctx->magma->input)
+	{
+		case 4:
+			magma_neuro_g4_4_primitive(ctx->magma, n1, n2, &y);
+			var1 = ((uint8_t *)&n1)[0] & 0xF;
+			var2 = ((uint8_t *)&y)[0] & 0xF;
+			fwrite(&var1, sizeof(uint8_t), 1, out_file_x);
+			fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+			break;
+		
+		case 8:
+			magma_neuro_g4_8_primitive(ctx->magma, n1, n2, &y);
+			var1 = ((uint8_t *)&n1)[0] & 0xFF;
+			var2 = ((uint8_t *)&y)[0] & 0xFF;
+			fwrite(&var1, sizeof(uint8_t), 1, out_file_x);
+			fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+			break;
 
-	uint8_t var2 = ((uint8_t *)&y)[0];
-	var2 = var2 & 0xF;
+		case 16:
+			magma_neuro_g4_16_primitive(ctx->magma, n1, n2, &y);
+			fwrite(&n1, sizeof(uint8_t), 2, out_file_x);
+			fwrite(&y, sizeof(uint8_t), 2, out_file_y);
+			break;
 
-	fwrite(&var, sizeof(uint8_t), 1, out_file_x);
-	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
-}
+		case 32:
+			magma_neuro_g4_32_primitive(ctx->magma, n1, n2, &y);
+			fwrite(&n1, sizeof(uint8_t), 4, out_file_x);
+			fwrite(&y, sizeof(uint8_t), 4, out_file_y);
+			break;
 
-/* Generator for G4 model */
-void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
-{
-	uint64_t out;
-	uint32_t y;
-	uint32_t n1 = GETU32_BE(((uint8_t *)&in));
-	uint32_t n2 = GETU32_BE(((uint8_t *)&in) + 4);
-
-	magma_neuro_g4l_primitive(ctx->magma, n1, n2, &y);
-
-	uint8_t var = ((uint8_t *)&n1)[0];
-	var = var & 0xFF;
-
-	uint8_t var2 = ((uint8_t *)&y)[0];
-	var2 = var2 & 0xFF;
-
-	fwrite(&var, sizeof(uint8_t), 1, out_file_x);
-	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
+		default:
+			printf("error: incorrect param\n");
+			break;
+	}
+	return;
 }
 
 model_type_t *feistel_formatter(const char *str)
@@ -571,6 +577,49 @@ model_type_t *feistel_formatter(const char *str)
 
 		this->gen_model_func = feistel_generator;
 		this->suite = FEISTEL;
+		return this;
+	}
+	return this;
+}
+
+/* Checker of G4 input */
+static uint8_t check_input(uint8_t value)
+{
+	if (value == 4 || value == 8 || value == 16 || value == 32)
+	{
+		return 1;
+	}
+	return 0;
+}
+
+model_type_t *g4_formatter(const char *str)
+{
+	const char *g4_format = "G4-%d",
+			   *g4_input = "bin/g4-%d_x.bin",
+			   *g4_output = "bin/g4-%d_y.bin";
+
+	uint8_t input;
+	model_type_t *this = NULL;
+	size_t buf_size = 21;
+
+
+	if (sscanf(str, g4_format, &input) == 1 && check_input(input))
+	{
+		this = (model_type_t *)malloc(sizeof(model_type_t));
+		this->name = malloc(buf_size);
+		this->default_input = malloc(buf_size);
+		this->default_output = malloc(buf_size);
+		
+		snprintf(this->name, 20, g4_format, input);
+		snprintf(this->default_input, 20, g4_input, input);
+		snprintf(this->default_output, 20, g4_output, input);
+
+		this->params.magma_params.input = input;
+		this->suite = MAGMA;
+
+		/* Shows that this model need free */
+		this->formatter = g4_formatter;
+		this->gen_model_func = primitive_g4_generator;
 		return this;
 	}
 	return this;

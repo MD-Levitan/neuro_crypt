@@ -10,6 +10,8 @@ typedef struct crypto_magma_ctx crypto_magma_ctx;
 struct crypto_magma_ctx
 {
 	magma_subkeys *keys;
+	/* Bits in input. Param for G4 model */
+	uint8_t input;
 };
 
 /**
@@ -154,9 +156,13 @@ extern void magma_neuro_g2_primitive(struct crypto_magma_ctx *magma_ctx, uint32_
 
 extern void magma_neuro_g3_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
-extern void magma_neuro_g4_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
+extern void magma_neuro_g4_4_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
-extern void magma_neuro_g4l_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
+extern void magma_neuro_g4_8_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
+
+extern void magma_neuro_g4_16_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
+
+extern void magma_neuro_g4_32_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
 #define magma_step(magma_ctx, out, in) \
 	magma_it(magma_ctx, out, in, 0)

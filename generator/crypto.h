@@ -27,7 +27,7 @@ union crypto_params {
     } feistel_params;
     struct
     {
-        /* data */
+        uint8_t input;
     } magma_params;
 };
 

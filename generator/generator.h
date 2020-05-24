@@ -148,7 +148,12 @@ void primitive_g2_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 void primitive_g3_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in);
 
 /**
- * @brief Generator for G4 model. Input - 4 bits, output - 4 bits.
+ * @brief Generator for G4 model. 
+ * Param in ctx shows (@input) number of bits in input.
+ * Support next @input: 4 bits  -> 4 bits
+ *                      8 bits  -> 8 bits
+ *                      16 bits -> 16 bits
+ *                      32 bits -> 32 bits
  * 
  * @param ctx           Crypto context
  * @param out_file_x    File context to write input
@@ -156,16 +161,6 @@ void primitive_g3_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
  * @param in            Input value
  */
 void primitive_g4_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in);
-
-/**
- * @brief Generator for G4-Long model. Input - 8 bits, output - 8 bits.
- * 
- * @param ctx           Crypto context
- * @param out_file_x    File context to write input
- * @param out_file_y    File context to write output
- * @param in            Input value
- */
-void primitive_g4l_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in);
 
 /**
  * @brief Generator for Feistel model. Input - 16 bits, output - 16 bits.
@@ -248,6 +243,15 @@ struct model_type_t
 model_type_t *feistel_formatter(const char *str);
 
 /**
+ * @brief Formatter for G4's model
+ * 
+ * @param str               input string
+ *  
+ * @return model_type_t     NULL if str is incorrect 
+ */
+model_type_t *g4_formatter(const char *str);
+
+/**
  * @brief Formatter for iter-split generator
  * 
  * @param str                   input string
@@ -256,6 +260,7 @@ model_type_t *feistel_formatter(const char *str);
  */
 generator_type_t *iter_split_formatter(const char *str);
 
+/* List of generators */
 static generator_type_t generators[] = {
     {
         .name = "iter",
@@ -341,21 +346,12 @@ static model_type_t models[] = {
         .suite = MAGMA,
     },
     {
-        .name = "G4",
-        .formatter = NULL,
+        .name = "G4-<I>",
+        .formatter = g4_formatter,
         .gen_model_func = primitive_g4_generator,
-        .description = "Use G4 model",
-        .default_input = "bin/g4_x.bin",
-        .default_output = "bin/g4_y.bin",
-        .suite = MAGMA,
-    },
-    {
-        .name = "G4L",
-        .formatter = NULL,
-        .gen_model_func = primitive_g4l_generator,
-        .description = "Use G4-Long model",
-        .default_input = "bin/g4l_x.bin",
-        .default_output = "bin/g4l_y.bin",
+        .description = "Use G4 model with <I> inputs",
+        .default_input = "bin/g4-<I>_x.bin",
+        .default_output = "bin/g4-<I>_y.bin",
         .suite = MAGMA,
     },
     {
