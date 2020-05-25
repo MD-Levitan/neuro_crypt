@@ -1,5 +1,5 @@
 import numpy as np
-
+import matplotlib.pyplot as plt
 
 def read_from_file(file, num_bytes: int, transform=lambda x: int.from_bytes(x, byteorder='little')):
     """
@@ -95,3 +95,32 @@ def hamming_distance(x: int, y: int):
         var >>= 1
     return distance
 
+
+class Graphic:
+    y_percent = False
+    y_limits: (float, float) = None
+
+    @staticmethod
+    def create_graph(x, y, legend: list, filename: str, ticks=None):
+        if Graphic.y_percent is True and Graphic.y_limits is not None:
+            y = list(map(lambda iter: (iter / Graphic.y_limits[1]) * 100, y))
+            print(y)
+            y_limits = (min(y) - 1, max(y) + 1)
+            axes = plt.gca()
+            axes.set_ylim(y_limits)
+
+        elif Graphic.y_limits is not None:
+            axes = plt.gca()
+            axes.set_ylim(Graphic.y_limits)
+
+        plt.plot(x, y)
+        if ticks is not None:
+            plt.xticks(x, ticks)
+
+        plt.xlabel(legend[0])
+        plt.ylabel(legend[1])
+
+        plt.title(legend[2])
+
+        plt.savefig(filename)
+        plt.close()
