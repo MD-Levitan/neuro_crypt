@@ -1,42 +1,3 @@
-import numpy as np
-import tensorflow as tf
-import time
-
-import utils
-
-
-@tf.RegisterGradient("Hamming")
-def hamming_loss_fn(y_true, y_pred) -> tf.Tensor:
-    threshold = tf.reduce_max(y_pred, axis=-1, keepdims=True)
-
-    # make sure [0, 0, 0] doesn't become [1, 1, 1]
-    # Use abs(x) > eps, instead of x != 0 to check for zero
-    # y_pred = tf.logical_and(y_pred >= threshold, tf.abs(y_pred) > 1e-12)
-    #
-    # y_true = tf.cast(y_true, tf.int32)
-    # y_pred = tf.cast(y_pred, tf.int32)
-
-    nonzero = tf.cast(tf.math.count_nonzero(y_true - y_pred, axis=-1), tf.float32)
-
-    nonzero = tf.square(nonzero)
-    print(nonzero)
-
-    return nonzero
-
-
-def loss_fn_(y_true, y_pred) -> tf.Tensor:
-    diff = tf.abs(y_true - y_pred)
-    mask = tf.greater(diff, 0.25)
-    print(y_true)
-    print(y_pred)
-    var = tf.where(mask, diff, diff * 0)
-
-    return tf.reduce_sum(var)
-
-
-def loss_fn(y_true, y_pred) -> tf.Tensor:
-    return tf.reduce_mean(tf.square(y_true - y_pred))
-    # return loss_fn_(y_true, y_pred)
 
 losses_default = {
     "sigmoid_cross_entropy": tf.compat.v1.losses.sigmoid_cross_entropy,
@@ -220,13 +181,6 @@ def init_multilayer_network(input_data: np.array, output_data: np.array, n_input
     x = tf.compat.v1.placeholder(tf.float32, [None, n_input])
     y = tf.compat.v1.placeholder(tf.float32, [None, n_classes])
 
-    # n_hidden = [n_hidden * i for i in range(1, number_layers + 1)]
-    # n_hidden = [n_hidden] * number_layers
-    # n_hidden = [int(sum([binomial(n_input, i)
-    # for i in range(1, level + 1)])) for level in range(1, number_layers + 1)]
-    # n_hidden = [sum([int(binomial(n_input, level))
-    # for level in range(1, number_layers + 1)])] + [n_hidden] * (number_layers - 1)
-
     prediction = multilayer_perceptron(x, n_hidden, n_classes, number_layers,
                                        activation_fun=activation, first_activation=True)
 
@@ -268,12 +222,6 @@ def init_multilayer_network(input_data: np.array, output_data: np.array, n_input
             print(list(map(lambda x: hex(utils.to_int(x)), predict_values)))
             print(list(map(lambda x: hex(utils.to_int(x)), test_values)))
             print(list(map(lambda x: hex(utils.to_int(x)), test_dataset)))
-            #
-            # print(list(map(lambda x: hex(utils.to_int(x)), predict_values1)))
-            # print(list(map(lambda x: hex(utils.to_int(x)), train_values)))
-            # print(list(map(lambda x: hex(utils.to_int(x)), train_dataset)))
-
-        # accuracy = tf.reduce_mean(tf.cast(hamming_distance, "float"))
 
         acc = accuracy.eval(feed_dict={x: test_dataset, y: test_values})
         los = loss.eval(feed_dict={x: test_dataset, y: test_values})
@@ -321,13 +269,6 @@ def init_recurrent_network(input_data: np.array, output_data: np.array, n_input:
 
     x = tf.compat.v1.placeholder(tf.float32, [None, n_input])
     y = tf.compat.v1.placeholder(tf.float32, [None, n_classes])
-
-    # n_hidden = [n_hidden * i for i in range(1, number_layers + 1)]
-    # n_hidden = [n_hidden] * number_layers
-    # n_hidden = [int(sum([binomial(n_input, i)
-    # for i in range(1, level + 1)])) for level in range(1, number_layers + 1)]
-    # n_hidden = [sum([int(binomial(n_input, level))
-    # for level in range(1, number_layers + 1)])] + [n_hidden] * (number_layers - 1)
 
     prediction = recurrent_perceptron(x, n_hidden, n_classes, number_layers,
                                       activation_fun=activation, first_activation=True)

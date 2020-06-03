@@ -156,6 +156,8 @@ extern void magma_neuro_g2_primitive(struct crypto_magma_ctx *magma_ctx, uint32_
 
 extern void magma_neuro_g3_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
+extern void magma_neuro_g5_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
+
 extern void magma_neuro_g4_4_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);
 
 extern void magma_neuro_g4_8_primitive(struct crypto_magma_ctx *magma_ctx, uint32_t n1, uint32_t n2, uint32_t *y);

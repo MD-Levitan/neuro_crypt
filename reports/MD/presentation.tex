@@ -1,0 +1,525 @@
+\documentclass[notheorems]{beamer}
+
+\usepackage{style/bsupresentation} % Подгружаем тему
+
+%%% Работа с русским языком и шрифтами
+\usepackage[english,russian]{babel}   % загружает пакет многоязыковой вёрстки
+%%\usepackage{fontspec}      % подготавливает загрузку шрифтов Open Type, True Type и др.
+%\defaultfontfeatures{Ligatures={TeX},Renderer=Basic}  % свойства шрифтов по умолчанию
+%\setmainfont[Ligatures={TeX,Historic}]{Arial} %TODO: Helvetica Light Normal
+%\setsansfont{Arial}  %TODO: Helvetica Light Normal
+%\setmonofont{Courier New}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+
+% Оформление теорем, лемм и т.д.
+\theoremstyle{plain}
+\newtheorem{Theorem}{Теорема}[]
+\newtheorem{Lemma}{Лемма}[]
+\newtheorem{Proposition}{Предложение}[]
+\newtheorem{Corollary}{Следствие}[]
+\newtheorem{Statement}{Утверждение}[]
+
+\theoremstyle{definition}
+\newtheorem{Definition}{Определение}[]
+\newtheorem{Conjecture}{Гипотеза}[]
+\newtheorem{Algorithm}{Алгоритм}[]
+\newtheorem{Property}{Свойство}[]
+
+\theoremstyle{remark}
+\newtheorem{Remark}{Замечание}[]
+\newtheorem{Example}{Пример}[]
+\newtheorem{Note}{Примечание}[]
+\newtheorem{Case}{Случай}[]
+\newtheorem{Assumption}{Предположение}[]
+
+\uselanguage{russian}
+\languagepath{russian}
+\deftranslation[to=russian]{Theorem}{Теорема}
+\deftranslation[to=russian]{Lemma}{Лемма}
+\deftranslation[to=russian]{Definition}{Определение}
+\deftranslation[to=russian]{Definitions}{Определения}
+\deftranslation[to=russian]{Corollary}{Следствие}
+\deftranslation[to=russian]{Fact}{Факт}
+\deftranslation[to=russian]{Example}{Пример}
+\deftranslation[to=russian]{Examples}{Примеры}
+
+\usepackage{multicol}       % Несколько колонок
+\graphicspath{{graphics/}}    % Папка с картинками
+
+%%% Информация об авторе и выступлении
+\title[]{Оценивание надежности криптографических преобразований на основе нейронных сетей}
+\author[М.Ю. Деркач]{Максим Юрьевич Деркач\\ \smallskip Научный руководитель: Юрий Семенович Харин}
+\institute[ММАД, ФПМИ, БГУ]{Факультет прикладной математики и информатики \\ \smallskip Кафедра математического моделирования и анализа данных}
+\date{Минск, \the\year}
+
+\begin{document}
+
+\frame[plain]{\titlepage}
+
+\begin{frame}
+  \frametitle{Содержание}
+  \tableofcontents
+\end{frame}
+
+\section{Введение}
+\begin{frame}
+\begin{scriptsize}
+  \frametitle{\secname}
+  \framesubtitle{Обзор литературы}
+  \begin{thebibliography}{5}
+    \beamertemplatearticlebibitems
+    \bibitem{crypto} Харин Ю.С., Берник В.И., Матвеев Г.В., Агиевич С.В. Математические и компьютерные основы криптологии. -- 2003. -- Минск.
+    \beamertemplatearticlebibitems
+    \bibitem{neuro_des} Mohammed M. Alani.Neuro-Cryptanalysis of DES and Triple-DES. -- 2012. 
+    \beamertemplatearticlebibitems
+    \bibitem{kinzel} Kinzel F., Kanter I. Neural Cryptography. -- 2002.
+    \beamertemplatearticlebibitems
+    \bibitem{encr_nn} Pattanayak S., Ludwig S.A. Encryption based on Neural Cryptography. -- 2017.
+    \beamertemplatearticlebibitems
+    \bibitem{bitwise_nn}M. Kim, P. Smaragdis, Bitwise Neural Networks. -- 2010.
+    
+  \end{thebibliography}
+\end{scriptsize}
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Цель исследования и постановка задач}
+	Цель исследования - оценивание надежности криптографических преобразований сети Фейстеля, используя искусственные нейронные сети.
+\end{frame}
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Цель исследования и постановка задач}
+Задачи:
+\begin{enumerate}
+	\item Провести аналитический анализ работ по теме нейронные сети в криптографии.
+
+	\item Основываясь на задачах исследования, определить архитектуру и параметры нейронной сети.
+	
+	\item Определить математические модели криптографических примитивов преобразования Фейстеля.
+	
+	\item Определить математические модель криптографического преобразования Фейстеля.
+	
+	\item Разработать генератор модельных данных.
+	
+	\item Построить нейронные сети, аппроксимирующие данную математическую модель. Провести компьютерные эксперименты.
+	
+	\item Оценить результаты полученные в ходе компьютерных экспериментов.
+\end{enumerate}
+\end{frame}
+
+\section{Искусственные нейронные сети и их применение в криптографии}
+\begin{frame}
+  \frametitle{\secname}
+  \framesubtitle{Модель криптоанализа}
+  
+  \tikzset{%
+  	block/.style    = {draw, thick, rectangle, minimum height = 3em,
+  		minimum width = 3em},
+  	sum/.style      = {draw, circle, node distance = 2cm}, % Adder
+  	input/.style    = {coordinate}, % Input
+  	output/.style   = {coordinate} % Output
+  }
+  
+  \begin{figure}[H]
+  	\begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45, scale=\textwidth/15.2cm]
+  	\draw
+  	
+  	node at (0,0)[right=-3mm]{\Large$\bullet$}
+  	node [input, name=plain] {} 
+  	node at (0,-3)[right=-3mm]{\Large$\bullet$}
+  	node at (0,-3) [input, name=cipher] {} 
+  	
+  	node at (5,-3)[block] (nn) {$Neural\ Network$}
+  	node at (10, 0)[block] (err) {$Error\ Function$}
+  	
+  	node at (10,-6)[block] (weight) {$Weights\ Correction$};
+  	
+  	
+  	\draw[->](plain) -- node {$Ciphertext$} (err);
+  	\draw[->](cipher) -- node {$Plaintext$} (nn);
+  	\draw[->](nn) -- node {} (err);
+  	
+  	\draw[->](err) -- node {} (weight);
+  	\draw[->](weight) -- node {} (nn);
+  	
+  	\end{tikzpicture}
+  	\caption{Модель криптоанализа на основе нейронной сети}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Оценка архитектуры и параметров нейронных сетей}
+	
+
+
+\end{frame}
+
+\section{Аппроксимация криптографических примитивов преобразования Фейстеля}
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+
+	Опишем однотактовое преобразование шифрования ГОСТ 28147-89:
+	\bigskip
+	
+	$Y = g(X, K) = g(X_1 || X_2, K) \equiv (S[X_1 \boxplus K] \ll 11) \oplus X_2 || X_1,$ где
+	
+	$X \in V_{64}$ - вектор входных данных,
+	
+	$Y \in V_{64}$ - выходные данные,
+	
+	$K \in V_{32}$ - ключ,
+	
+	$S$ - стандартный S-блок из ГОСТ-28147.
+		
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+	
+\begin{enumerate}
+	\item
+	$Y_{g_0} = g_0(x) = g_0(x_1 || x_2)\equiv x_1 \oplus x_2,$ где
+	
+	$x \in V_{8}$ - вектор входных данных,
+	
+	$x_1, x_2 \in V_{4}$ - левая и правая часть входного вектора,
+	
+	$Y_{g_0} \in V_{4}$ - выходные данные модели $g_0$;
+	\bigskip
+	
+	\item
+	$Y_{g_1} = g_1(x) = g_1(x_1 || x_2, k) \equiv S[x_1] \oplus x_2,$ где
+	
+	$x \in V_{8}$ - вектор входных данных,
+	
+	$x_1, x_2 \in V{4}$ - левая и правая часть входного вектора,
+	
+	$Y_{g_1} \in V_{4}$ - выходные данные модели $g_1$,
+	
+	$S$ - первый узел из стандартного S-блока из ГОСТ-28147 
+	
+	($ S = \{13, 2, 8, 4, 6, 15, 11, 1, 10, 9, 3, 14, 5, 0, 12, 7\}$);
+	\bigskip
+	
+	
+\end{enumerate}
+	
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+	
+	\begin{enumerate}
+		\setcounter{enumi}{2}
+		\item
+		$Y_{g_2} = g_2(x) = g_2(x_1 || x_2, k) \equiv S[x_1 \boxplus k] \oplus x_2,$ где
+		
+		$x \in V_{8}$ - вектор входных данных,
+		
+		$x_1, x_2 \in V{4}$ - левая и правая часть входного вектора,
+		
+		$k \in V_{4}$ - некоторый неизвестный постоянный в эксперименте ключ,
+		
+		$Y_{g_2} \in V_{4}$ - выходные данные модели $g_2$,
+		
+		$S$ - первый узел из стандартного S-блока из ГОСТ-28147;
+		
+		\item 
+		$Y_{g_3} = g_3(X) = g_3(x_1 || x_2, k) \equiv (S[x_1 \boxplus k] \ll 11) \oplus x_2,$ где
+		
+		$x \in V_{64}$ - вектор входных данных,
+		
+		$k \in V_{32}$ - некоторый неизвестный постоянный в эксперименте ключ,
+		
+		$Y_{g_3} \in V_{32}$ - выходные данные модели $g_3$,
+		
+		$S$ - стандартный S-блок из ГОСТ-28147;
+		
+		
+	\end{enumerate}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+	
+	\begin{enumerate}
+		\setcounter{enumi}{4}
+		
+		\item
+		$Y_{g_4} = g_4(x) \equiv x \boxplus K,$ где
+		
+		$x \in V_{4}$ - вектор входных данных,
+		
+		$k \in V_{4}$ - некоторый неизвестный постоянный в эксперименте ключ,
+		
+		$Y_{g_4} \in V_{4}$ - выходные данные модели $g_4$;
+		\bigskip
+		
+		\item
+		$Y_{g_8} = g_8(x) \equiv x \boxplus K,$ где
+		
+		$x \in V_{8}$ - вектор входных данных,
+		
+		$k \in V_{8}$ - некоторый неизвестный постоянный в эксперименте ключ,
+		
+		$Y_{g_8} \in V_{8}$ - выходные данные модели $g_8$;
+		\bigskip
+	
+		
+	\end{enumerate}
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+	
+	\begin{enumerate}
+		\setcounter{enumi}{6}
+		
+		
+		\item
+		$Y_{g_{16}} = g_{16}(x) \equiv x \boxplus K,$ где
+		
+		$x \in V_{16}$ - вектор входных данных,
+		
+		$k \in V_{16}$ - некоторый неизвестный постоянный в эксперименте ключ,
+		
+		$Y_{g_{16}} \in V_{16}$ - выходные данные модели $g_{16}$;
+		\bigskip
+		
+		\item
+		$Y_{g_{32}} = g_{32}(x) \equiv x \boxplus K,$ где
+		
+		$x \in V_{32}$ - вектор входных данных,
+		
+		$k \in V_{32}$ - некоторый неизвестный постоянный в эксперименте ключ,
+		
+		$Y_{g_{32}} \in V_{g_{32}}$ - выходные данные модели $g_{32}$.
+		\bigskip
+		
+	\end{enumerate}
+	
+\end{frame}
+
+
+
+\begin{frame}
+  \frametitle{\secname}
+  \framesubtitle{Численные результаты}
+  
+  \begin{figure}[H]
+  	\includegraphics[width=0.7\linewidth]{results/g0_0.png}
+  	
+  	\caption{График точности построенной однослойной нейронной сети модели $g_0$ от количества итераций обучения}
+  	
+  \end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Численные результаты}
+
+	\begin{figure}[H]
+		\includegraphics[width=0.8\linewidth]{results/g0_1.png}
+		
+		\caption{График точности построенной нейронной сети с одним скрытым слоем модели $g_0$ от количества нейронов на скрытом слое}
+	\end{figure}
+
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Численные результаты}
+	
+	
+	\begin{figure}[H]
+		\includegraphics[width=0.8\linewidth]{results/g0_1_x.png}
+		
+		\caption{График точности построенной нейронной сети с одним скрытым слоем и 8 нейронами на нем модели $g_0$ от количества нейронов на скрытом слое}
+	\end{figure}
+	
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Численные результаты}
+	
+\begin{table}[H]
+	\scalebox{0.7}{%
+	\begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+		\hline
+		Модель  & НС    & $N$         & $NP$              & $T_o$       & $T_e$  & $\hat{f}$ & l   & $\Sigma$ & $\Psi$ \\ \hline
+		$g_{0}$ & MNN   &      8      &            96     &         128 &    24  &   4       &  0.1072   & 5000     &   1.3754    \\ \hline
+		$g_{0}$ & NN    &      0      &            96     &         128 &    24  &   3.2     &  0.5867   & 5000     &   1.6164    \\ \hline
+		$g_{1}$ & MNN   &      8      &            96     &         128 &    24  &   4       &  0.1365   & 10000    &   2.7018    \\ \hline
+		$g_{1}$ & NN    &      0      &            96     &         128 &    24  &   2.300   &  0.6505   & 25000    &   6.1263    \\ \hline
+		$g_{2}$ & MNN   &      8      &            96     &         128 &    24  &   4       &  0.1585   & 20000    &   5.4420    \\ \hline
+		$g_{2}$ & NN    &      0      &            96     &         128 &    24  &   2.6539  &  0.6341   & 20000    &   7.1460 	\\ \hline
+		%$g_{3}$ & MNN   &      32       &                   &         2048&   409  &           &     & 10000    &       \\ \hline
+		%$g_{3}$ & NN    &             &                   &         2048&   409  &           &     & 10000    &       \\ \hline
+		$g_{4}$ & MNN   &      4      &            32     &         10  &     5  &    4      &  0.0720   & 10000    &   2.0639    \\ \hline
+		$g_{4}$ & NN    &      0      &            32     &         10  &     5  &    3.500  &  0.5526   & 10000    &   3.1317    \\ \hline
+		$g_{8}$ & MNN   &      8      &            128    &         128 &    24  &    8      &  0.0519   & 5000     &   2.4865    \\ \hline
+		$g_{8}$ & NN    &      0      &            128    &         128 &    24  &    7.5385 &  0.5039   & 10000    &  3.8590    \\ \hline
+		$g_{16}$& MNN   &      16     &            512    &         512 &   129  &   16      &  0.0520   & 15000    &  6.3108     \\ \hline
+		$g_{16}$& NN    &      0     &            512    &         512 &   129  &   14.3650 &  0.5386   & 20000    &  9.5851    \\ \hline
+		$g_{32}$& MNN   &      32     &            4096   &         2048&   409  &   32      &  0.0120   & 10000    &  18.8175     \\ \hline
+		$g_{32}$& NN    &      0     &            4096   &         2048&   409  &   27.2161 &  0.5614   & 15000    &  20.2561     \\ \hline
+	\end{tabular}}
+	\caption{Сравнение построенных нейронных сетей}
+\end{table} 
+	
+\end{frame}
+
+
+\section{Оценка надежности криптографического преобразования Фейстеля с помощью его аппроксимации нейронной сетью}
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+	
+	$V = {0, 1};$
+	
+	$N$- размерность;
+	
+	$X = (x_i) \in V^{2N}, X = (X_1 \| X_2) \in V^{2N}, X_i \in V^N, i=1,2;$
+	
+	
+	$Y = (y_i) \in V^{2N}, Y = (Y_1 \| Y_2) \in V^{2N}, Y_i \in V^N, i=1,2;$
+	
+	
+	$K=(K1\|...\|K_8)=(k_1,...,k_{8N})$ - ключ тактового преобразования;
+	
+	
+	$<K_i> \in \{0,1,...,2^{N}-1\}$ - числовое представление двоичного вектора $K_i$;
+	
+	
+	$\lll L$ - циклический сдвиг влево на $L$ бит;
+	
+	
+	$f(\cdot):V^N \times V^N \rightarrow V^N$ - функция криптографического преобразования Фейстеля;
+	
+	
+	$g(\cdot):V^N \rightarrow V^N$ - расписание ключей.
+	
+\end{frame}
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+	
+	  \tikzset{%
+		block/.style    = {draw, thick, rectangle, minimum height = 0.5em,
+			minimum width = 0.5em},
+		sum/.style      = {draw, circle, node distance = 1cm}, % Adder
+		input/.style    = {coordinate}, % Input
+		output/.style   = {coordinate} % Output
+	}
+\begin{figure}
+	\begin{tikzpicture}[auto, thick, node distance=2cm, >=triangle 45, scale=\textwidth/26.2cm]
+	\draw
+	% Drawing the blocks of first filter :
+	node [block] (x1) {$X_1$}
+	node at (10,0)[block] (x2) {$X_2$}
+	
+	node at (10,-3)[sum] (f) {$f(\cdot)$}
+	node at (13,-3)[sum] (k) {$K_i$}
+	
+	node at (10,-6)[block] (l) {$\lll L$}
+	node at (10,-9)[sum] (sum) {$\oplus$}
+	
+	node at (0,-12) [block] (y1) {$Y_1$}
+	node at (10,-12)[block] (y2) {$Y_2$};
+	% Joining blocks. 
+	
+	\draw[->](x1) -- node {} (sum);
+	\draw[->](x2) -- node {} (f);
+	\draw[->](x2) -- node {} (y1);
+	\draw[->](k) -- node {} (f);
+	\draw[->](f) -- node {} (l);
+	\draw[->](l) -- node {} (sum);
+	\draw[->](sum) -- node {} (y2);
+	
+	
+	\end{tikzpicture}
+	\caption{Модельное 1-тактовое преобразование с $i$-ым подключом}
+\end{figure}
+	
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Математические модели}
+
+	$f(X_2;K) = S[X_2 \boxplus K]$,
+	где $S$ - два первых стандартных S-блока из ГОСТ-28147.
+	
+	$g(K)=K_1, ..., K_8; K_1,...K_8;...;K_1,...K_8$.
+	
+	Параметр $N$ постоянный и равен = 8.
+	
+	Параметры $L$, $I$ - изменяемые параметры в следующих диапозонах:
+	\begin{itemize}
+		\item $L \in \{0,1,...,7\};$
+		
+		\item $I \in \{1,...,8\};$
+	\end{itemize}
+	
+\end{frame}
+
+
+\begin{frame}
+	\frametitle{\secname}
+	\framesubtitle{Численные результаты}
+	
+	
+\end{frame}
+
+\section{Заключение}
+\begin{frame}
+  \frametitle{\secname}
+  Основные результаты:
+  \begin{enumerate}
+    \item Для математических моделей криптографических преборазований Фейстеля был разработан генератор и построенны нейронные сети;
+    \item Была проведена оценка полученных результатов.
+    \item Проведены компьютерные эксперименты, иллюстрирующие теоретические результаты.
+  \end{enumerate}
+\end{frame}
+
+\begin{frame}[c]
+\begin{center}
+\frametitle{\LARGE Спасибо за внимание!}
+
+\bigskip
+
+\inserttitle
+
+\bigskip\bigskip
+\insertauthor
+
+\bigskip\bigskip\bigskip\bigskip\bigskip\bigskip
+
+\insertdate
+
+\end{center}
+\end{frame}
+
+\end{document}

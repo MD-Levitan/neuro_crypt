@@ -158,6 +158,8 @@ void random_iterate_generator(crypto_tfm *ctx, generator_params_t *params, uint6
 	fclose(out_file_y);
 }
 
+
+
 /* Iterate in 2 blocks generator */
 void iterate_split_generator(crypto_tfm *ctx, generator_params_t *params, uint64_t size,
 							 const char *filename_x, const char *filename_y,
@@ -387,8 +389,7 @@ void primitive_g0_generator_(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y
 	// printf("%llx\n", out);
 
 	uint8_t p = 0;
-	//for (uint8_t p = 0; p < 8; ++p)
-	//{
+
 	uint8_t var = ((uint8_t *)&in)[4 + p / 2];
 	var = p % 2 ? (var & 0xF) : (var >> 4 & 0xF);
 
@@ -401,7 +402,6 @@ void primitive_g0_generator_(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y
 
 	fwrite(&var, sizeof(uint8_t), 1, out_file_x);
 	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
-	//}
 }
 
 /* Generator for G0 model */
@@ -414,6 +414,7 @@ void primitive_g0_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 
 	magma_neuro_g0_primitive(ctx->magma, n1, n2, &y);
 
+	
 	uint8_t var = ((uint8_t *)&n1)[0];
 	var = var & 0xF;
 
@@ -488,7 +489,24 @@ void primitive_g3_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y,
 	out = SWAP_32(y);
 
 	fwrite((uint8_t *)&in, sizeof(uint8_t), 8, out_file_x);
-	fwrite((uint8_t *)&out, sizeof(uint8_t), 8, out_file_y);
+	fwrite((uint8_t *)&out, sizeof(uint8_t), 4, out_file_y);
+}
+
+/* Generator for G5 model */
+void primitive_g5_generator(crypto_tfm *ctx, FILE *out_file_x, FILE *out_file_y, uint64_t in)
+{
+	uint64_t out;
+	uint32_t y;
+	uint32_t n1 = GETU32_BE(((uint8_t *)&in));
+	uint32_t n2 = GETU32_BE(((uint8_t *)&in) + 4);
+	uint8_t var1, var2;
+
+	magma_neuro_g5_primitive(ctx->magma, n1, n2, &y);
+
+	var1 = ((uint8_t *)&n1)[0] & 0xF;
+	var2 = ((uint8_t *)&y)[0] & 0xF;
+	fwrite(&var1, sizeof(uint8_t), 1, out_file_x);
+	fwrite(&var2, sizeof(uint8_t), 1, out_file_y);
 }
 
 /* Generator for Feistel model */
@@ -675,10 +693,14 @@ void destroy_generator(generator_type_t *generator)
 void generate_random_key(uint8_t *key)
 {
 	srand(time(NULL));
-	for (uint8_t i = 0; i < 32; ++i)
-	{
-		key[i] = 0x86; //rand();
-	}
+	memset(key, 0, 32);
+	uint32_t *key_ptr = (uint32_t *)key;
+	key_ptr[0] = 0xA6B7C8D9;
+
+	// for (uint8_t i = 0; i < 32; ++i)
+	// {
+	// 	key[i] = 0x86; //rand();
+	// }
 }
 
 void print_models()

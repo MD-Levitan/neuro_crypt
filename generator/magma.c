@@ -278,6 +278,11 @@ inline static uint32_t f_neuro_g1(uint32_t x, uint32_t key)
 		k2[x >> 4 & 15] << 4 | k1[x & 15];
 }
 
+inline static uint8_t f4(uint8_t x)
+{
+	return k1[x & 15];
+}
+
 /* neuro  primitive without rotation*/
 inline static uint32_t f_neuro_g2(uint32_t x)
 {
@@ -459,8 +464,8 @@ void magma_neuro_g1_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t
 	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
 	uint32_t buf = 0;
 
-	//buf = f_neuro_g1(n1, 0);
-	buf = f_neuro_g2(n1);
+	//buf = f_neuro_g2(n1);
+	buf = f4(n1 & 0xF);
 	*y = buf ^ n2;
 }
 
@@ -502,6 +507,15 @@ void magma_neuro_g3_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t
 	*y = buf ^ n2;
 }
 
+void magma_neuro_g5_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t n1, const uint32_t n2, uint32_t *y)
+{
+	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
+	uint32_t buf = 0;
+
+	buf = f4(n1 & 0xF);
+	*y = buf;
+}
+
 void magma_neuro_g4_4_primitive(struct crypto_magma_ctx *magma_ctx, const uint32_t n1, const uint32_t n2, uint32_t *y)
 {
 	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
@@ -524,7 +538,7 @@ void magma_neuro_g4_16_primitive(struct crypto_magma_ctx *magma_ctx, const uint3
 {
 	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
 	uint16_t buf = (uint16_t)(n1 & 0xFFFF);
-	uint16_t key = (subkeys->k[0] << 8) | subkeys->k[1];
+	uint16_t key = subkeys->k[0];
 
 	buf += key;
 	*y = buf;
@@ -534,7 +548,8 @@ void magma_neuro_g4_32_primitive(struct crypto_magma_ctx *magma_ctx, const uint3
 {
 	magma_subkeys *subkeys = keys_magma_ctx(magma_ctx);
 	uint32_t buf = n1;
-	uint32_t key = GETU32_BE(subkeys->k);
+	uint32_t key = subkeys->k[0];
+	printf("Key: %llx\n", key);
 
 	buf += key;
 	*y = buf;

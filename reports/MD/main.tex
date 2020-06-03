@@ -1,0 +1,81 @@
+\documentclass[a4paper,14pt]{extreport}
+
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{style/bsumain}
+\usepackage{style/bsumastertitle}
+\usepackage{blindtext}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows}
+\usepackage{hyperref}
+\usepackage{style/dsfont}
+
+
+\subfaculty{Кафедра математического моделирования и анализа данных}
+\title{ОЦЕНИВАНИЕ НАДЕЖНОСТИ КРИПТОГРАФИЧЕСКИХ ПРЕОБРАЗОВАНИЙ НА ОСНОВЕ НЕЙРОННЫХ СЕТЕЙ}
+\author{ДЕРКАЧ Максим Юрьевич}
+\mentor{Харин Юрий Семенович, \\
+        кандидат физ.-мат. наук, \\
+    	профессор, \\
+    	чл.-корр НАН Беларуси	
+    }
+\reviewer{Зав. кафедрой ММАД \\
+	Бодягин Игорь Александрович \\
+	кандидат физ.-мат. наук, доцент}
+\specialty{1-31 81 12 <<Прикладной компьютерный анализ данных>>}
+
+\begin{document}
+  \maketitle
+  
+  {
+    \renewcommand{\contentsname}{Оглавление}
+    \tableofcontents
+  }
+
+  \newpage
+  \input{sections/ref_rus}
+ \newpage
+ \input{sections/ref_bel}
+ \newpage
+ \input{sections/ref_eng} 
+
+  \newpage
+  \input{sections/intro}
+  \newpage
+  \input{sections/goal}
+  
+  \newpage
+  \input{chapters/chapter1}
+  \newpage
+  \input{chapters/chapter2}
+  \newpage
+  \input{chapters/chapter3}
+  
+  \newpage
+  \input{sections/conclusion.tex}
+  
+  \newpage
+  \input{sections/bibliography}
+ 
+  \newpage
+  \addcontentsline{toc}{chapter}{Приложение}
+  \section{Исходный код реализации}
+  Для построения нейронных сетей использовалась библиотека Tensorflow.
+  
+  Программное обеспечение, используемое для реализации нейронных сетей: Python 3.7, Tensorflow (Tensorflow Core r1.15).
+  
+  Программное обеспечение, используемое для реализации генератора модельных данных: С11, Make.
+  
+  Процессор: Intel(R) Core(TM) i7-8750H 2.20GHz. Память: 16240MB.
+  
+  Репозиторий с реализацией нейронных сетей и генератора модельных данных: \href{https://github.com/MD-Levitan/neuro_crypt}{https://github.com/MD-Levitan/neuro\_crypt}.
+  
+	\bigskip
+  Выдержки из исходного кода:
+  \bigskip
+  \lstinputlisting[language=C]{generator.h}
+  \lstinputlisting[language=Python]{networks.py}
+  
+\end{document}

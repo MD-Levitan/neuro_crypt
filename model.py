@@ -53,11 +53,24 @@ class ModelStorage:
             self.storage[model_name] = Model(input_file="generator/bin/{}_x.bin".format(model_name),
                                              output_file="generator/bin/{}_y.bin".format(model_name),
                                              input_size=8, output_size=4)
+        model_name = "g3"
+        self.storage[model_name] = Model(input_file="generator/bin/{}_x.bin".format(model_name),
+                                                 output_file="generator/bin/{}_y.bin".format(model_name),
+                                                 input_size=64, output_size=32)
+
+        model_name = "g5"
+        self.storage[model_name] = Model(input_file="generator/bin/{}_x.bin".format(model_name),
+                                                 output_file="generator/bin/{}_y.bin".format(model_name),
+                                                 input_size=4, output_size=4)
+
+
+
         # Adding G4-<S> models
         for size in (4, 8, 16, 32):
-            model_name = "g4-{}".format(size)
-            self.storage[model_name] = Model(input_file="generator/bin/{}_x.bin".format(model_name),
-                                             output_file="generator/bin/{}_y.bin".format(model_name),
+            model_name = "g{}".format(size)
+            file = "g4-{}".format(size)
+            self.storage[model_name] = Model(input_file="generator/bin/{}_x.bin".format(file),
+                                             output_file="generator/bin/{}_y.bin".format(file),
                                              input_size=size, output_size=size)
 
     def add_custom_model(self, model_name: str, input_size: int, output_size: int, in_fun=None, out_fun=None,

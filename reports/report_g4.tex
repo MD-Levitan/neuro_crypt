@@ -1,0 +1,155 @@
+\documentclass[a4paper,12pt,twoside]{article}
+\usepackage[T1,T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+
+
+\usepackage{graphicx}
+\usepackage{blindtext}
+\usepackage{mathrsfs}
+\usepackage[russian,english]{babel}
+\usepackage{enumitem}
+\usepackage[english,russian]{babel}
+\usepackage{amsmath}
+\usepackage[section]{placeins}
+\usepackage{amssymb}
+\usepackage[top=20mm, bottom=20mm, left=20mm, right=20mm]{geometry}
+
+\begin{document}
+	\title{Модель $X \boxplus K$}
+	\maketitle
+	
+	\section{ Математическое описание моделей}
+	
+	Определим математичские модели "$X \boxplus K$":
+	
+	\begin{enumerate}
+	\item 
+	$Y_{g_4} = g_4(x) \equiv x \boxplus K,$ где
+	
+	$x \in V_{4}$ - вектор входных данных,
+	
+	$k \in V_{4}$ - некоторый неизвестный постоянный в эксперименте ключ,
+	
+	$Y_{g_4} \in V_{4}$ - выходные данные модели $g_4$;
+	\bigskip
+		
+	\item 
+	$Y_{g_8} = g_8(x) \equiv x \boxplus K,$ где
+	
+	$x \in V_{8}$ - вектор входных данных,
+	
+	$k \in V_{8}$ - некоторый неизвестный постоянный в эксперименте ключ,
+	
+	$Y_{g_8} \in V_{8}$ - выходные данные модели $g_8$;
+	\bigskip
+	
+		\item 
+	$Y_{g_{16}} = g_{16}(x) \equiv x \boxplus K,$ где
+	
+	$x \in V_{16}$ - вектор входных данных,
+	
+	$k \in V_{16}$ - некоторый неизвестный постоянный в эксперименте ключ,
+	
+	$Y_{g_{16}} \in V_{16}$ - выходные данные модели $g_{16}$;
+	\bigskip
+	
+	\item 
+	$Y_{g_{32}} = g_{32}(x) \equiv x \boxplus K,$ где
+	
+	$x \in V_{32}$ - вектор входных данных,
+	
+	$k \in V_{32}$ - некоторый неизвестный постоянный в эксперименте ключ,
+	
+	$Y_{g_{32}} \in V_{g_{32}}$ - выходные данные модели $g_{32}$.
+	\bigskip
+
+	\end{enumerate}
+
+	
+	\newpage
+	\section{Описание используемых нейронных сетей}	
+	\bigskip
+	\noindent Для решения поставленных задач использовались следующие нейронные сети (с минимальным количеством параметров):
+	
+	\begin{enumerate}
+		\item Модель $g_4$: нейронная сеть с одним скрытым слоем, с 4 нейронами на скрытом слое (HNN-4).
+		\item Модель $g_8$: нерйонная сеть с одним скрытым слоем, с 8 нейронами на скрытом слое (HNN-8).
+		\item Модель $g_{16}$: нерйонная сеть с одним скрытым слоем, с 16 нейронами на скрытом слое (HNN-16).
+		\item Модель $g_{32}$: нерйонная сеть с одним скрытым слоем, с 64 нейронами на скрытом слое (HNN-64).
+		(Примечание: для модлеи $g_{32}$ также была построенна НС с 32 нейронами на скрытом слое. Однако масимально достигнутая точность была 87.5\%. Поэтому от нее я отказался и использовал модель HNN-64.)
+	\end{enumerate}
+	
+
+	\noindent Точность построенной модели к реальной оценивалась использовалось расстояние Хэмминга:
+	$w(y, \hat{y}) = \sum_{i=1}^{j} y_i \oplus \hat{y}_i$, где $y_i \in V_j$.
+	\bigskip
+	
+	\noindent Для оценки точности проведенного эксперимента использовалось следующая функция:
+	$\hat{f} =L - \dfrac{1}{T_e}\sum_{j=1}^{T_e}w(y^{(j)}, \hat{y^{(j)}})$,
+	где $L$ - количество бит в выходных данных оцениваемой модели. 
+
+	\bigskip
+	\noindent Компьютерные эксперименты проводились на следующих данных:
+	\begin{enumerate}
+		\item Модель $G_4$ :
+		\begin{itemize}
+		\item количество параметров для HNN-4: 32; 
+		\item обучающая выборка $T_o=10$ пар $(x, y)$;
+		\item экзаменационная выборка $T_e=6$ пар $(x, y)$.
+		\end{itemize}
+	
+		\item Модель $G_8$:
+		\begin{itemize}
+			\item количество параметров для HNN-8: 128; 
+			\item обучающая выборка $T_o=128$ пар $(x, y)$;
+			\item экзаменационная выборка $T_e=24$ пар $(x, y)$.
+		\end{itemize}
+	
+		\item Модель $G_{16}$:
+		\begin{itemize}
+			\item количество параметров для HNN-16: 512; 
+			\item обучающая выборка $T_o=512$ пар $(x, y)$;
+			\item экзаменационная выборка $T_e=102$ пар $(x, y)$.
+		\end{itemize}
+		
+		\item Модель $G_{32}$:
+		\begin{itemize}
+			\item количество параметров для HNN-64: 4096; 
+			\item обучающая выборка $T_o=2048$ пар $(x, y)$;
+			\item экзаменационная выборка $T_e=409$ пар $(x, y)$.
+		\end{itemize}
+	\end{enumerate}
+	
+	
+	\newpage
+	\section{Результаты компьютерных экспериментов}
+	
+	\begin{figure}[htb!]
+	\includegraphics[width=0.8\linewidth]{report_g4/g4.png}
+	
+	График точности построенной неройнной сети HNN-4 модели $g_4$ от количества итераций обучения.
+		
+	\end{figure}
+	\begin{figure}[htb!]
+	\includegraphics[width=0.8\linewidth]{report_g4/g8.png}
+	
+	График точности построенной неройнной сети HNN-8 модели $g_8$ от количества итераций обучения.
+	
+	\end{figure}
+
+		\begin{figure}[htb!]
+		\includegraphics[width=0.8\linewidth]{report_g4/g16.png}
+		
+		График точности построенной неройнной сети HNN-16 модели $g_{16}$ от количества итераций обучения.
+		
+	\end{figure}
+
+	\begin{figure}[htb!]
+	\includegraphics[width=0.8\linewidth]{report_g4/g32.png}
+	
+	График точности построенной неройнной сети HNN-64 модели $g_{32}$ от количества итераций обучения.
+	
+\end{figure}
+
+		
+\end{document}
